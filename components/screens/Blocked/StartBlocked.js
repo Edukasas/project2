@@ -29,7 +29,6 @@ export default function StartBlocked(){
               style={styles.button}>
                 <Text style={styles.buttonText}>Create app limit</Text>
               </Pressable>
-              
               {showImages && (
   <View>
     {apps.map((app, idx) => (
