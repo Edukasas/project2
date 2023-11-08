@@ -30,12 +30,12 @@ export default function StartBlocked(){
                 <Text style={styles.buttonText}>Create app limit</Text>
               </Pressable>
               {showImages && (
-  <View>
+  <View style={styles.appContainer}>
     {apps.map((app, idx) => (
      <View key={idx} style={styles.appItem}>
      <Image
        source={{ uri: 'data:image/png;base64,' + app.icon }}
-       style={{ width: 50, height: 50 }}
+       style={styles.img}
      />
      <Text style={styles.appLabel}>{app.label}</Text>
    </View>
@@ -47,6 +47,26 @@ export default function StartBlocked(){
     );
 }
 const styles = StyleSheet.create({
+    appContainer: {
+      backgroundColor: 'red',
+      borderRadius: 17,
+      width: '80%',
+      alignSelf: 'center',
+    },
+    appItem: {
+      marginTop: 15,
+      marginLeft: 15,
+      gap: 10,
+      alignItems: 'center',
+      flexDirection: 'row',
+    },
+    appLabel: {
+      
+    },
+    img: {
+       width: 50,
+       height: 50,
+    },
     Container: {
         backgroundColor: 'black',
         flex: 1,
