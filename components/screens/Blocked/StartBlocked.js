@@ -1,49 +1,34 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, Pressable, StyleSheet, View} from 'react-native';
+import Menu from './menu';
 import { useEffect, useState} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
-import { SwipeListView } from 'react-native-swipe-list-view';
 
 export default function StartBlocked(){
-    const [apps, setApps] = useState([]);
-    const [showImages, setShowImages] = useState(false);
-    useEffect(() => {
-        // Load the apps when the component mounts
-        const loadApps = async () => {
-            const appList = await InstalledApps.getApps();
-            setApps(appList);
-        };
-    
-        loadApps();
-      }, []);
-    return(
-        <View style={styles.Container}>
-        <Image
+    const [showMenu, setShowMenu] = useState(false);
+    const navigateToMenu = () => {
+      setShowMenu(true);
+    };
+     return(
+     <View style={styles.Container}>
+      {showMenu ? (
+        <Menu/>
+      ) : (
+        <View>
+     <Image
         source={require('../../../assets/images/app_blocking.png')}
         style={styles.logo}
       />
             <Text style={styles.Text1}>No app limits created.</Text>
             <Text style={styles.Text2}>App limits enable you to use specific apps, block them for a set period, and then resume using them.</Text>
             <Pressable
-            onPress={() => setShowImages(true)}
+            onPress={navigateToMenu}
               style={styles.button}>
                 <Text style={styles.buttonText}>Create app limit</Text>
               </Pressable>
-              {showImages && (
-  <View style={styles.appContainer}>
-    {apps.map((app, idx) => (
-     <View key={idx} style={styles.appItem}>
-     <Image
-       source={{ uri: 'data:image/png;base64,' + app.icon }}
-       style={styles.img}
-     />
-     <Text style={styles.appLabel}>{app.label}</Text>
-   </View>
-    ))}
-  </View>
-)}
-
-         </View>
+              </View>
+      )}
+          </View>
     );
 }
 const styles = StyleSheet.create({
