@@ -3,6 +3,7 @@ import { useEffect, useState} from 'react';
 import Start from './components/Start';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CategoryProvider } from './components/screens/Blocked/CategoryContext';
 
 export default function App() {
   const [page, setPage] = useState('start');
@@ -31,18 +32,20 @@ export default function App() {
   }, []); // The empty dependency array ensures this effect runs once
 
   return (
-    <View style={styles.container}>
-      {page === 'start' ? (
-        <Start
-          onPress={() => {
-            setIsStarted();
-            setPage('main');
-          }}
-        />
-      ) : (
-        <MainContainer />
-      )}
-    </View>
+    <CategoryProvider>
+      <View style={styles.container}>
+        {page === 'start' ? (
+          <Start
+            onPress={() => {
+              setIsStarted();
+              setPage('main');
+            }}
+          />
+        ) : (
+          <MainContainer />
+        )}
+      </View>
+    </CategoryProvider>
   );
 }
 

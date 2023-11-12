@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, Pressable, StyleSheet, View} from 'react-native';
 import Menu from './menu';
-import { useEffect, useState} from 'react';
-import { InstalledApps } from 'react-native-launcher-kit';
+import { useState} from 'react';
 
 export default function StartBlocked(){
     const [showMenu, setShowMenu] = useState(false);
@@ -10,7 +9,7 @@ export default function StartBlocked(){
       setShowMenu(true);
     };
      return(
-     <View style={styles.Container}>
+     <View>
       {showMenu ? (
         <Menu/>
       ) : (
@@ -46,21 +45,14 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
     },
     appLabel: {
-      
+      color: 'white',
+      fontFamily: 'Roboto-Regular',
+      fontSize: 12,
     },
     img: {
        width: 50,
        height: 50,
     },
-    Container: {
-        backgroundColor: 'black',
-        flex: 1,
-    },
-    appLabel: {
-        color: 'white',
-        fontFamily: 'Roboto-Regular',
-        fontSize: 12, // You can adjust the font size
-      },
     logo: {
         marginTop: 194,
         alignSelf: 'center',
@@ -95,6 +87,6 @@ const styles = StyleSheet.create({
         marginTop: 9,
         marginBottom: 9,
         marginLeft: 29,
-        marginRight: 29,  
+        marginRight: 29,
     },
 });

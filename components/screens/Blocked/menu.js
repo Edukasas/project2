@@ -3,12 +3,14 @@ import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pre
 import { useEffect, useState} from 'react';
 import MainBlocked from './MainBlocked';
 import { InstalledApps } from 'react-native-launcher-kit';
+import { useCategoryContext } from './CategoryContext';
 
 export default function StartBlocked(){
+    const { state, dispatch } = useCategoryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
-    const [customCategoryName, setCustomCategoryName] = useState('');
-    const [categories, setCategories] = useState([]);
+    //const [customCategoryName, setCustomCategoryName] = useState('');
+    //const [categories, setCategories] = useState([]);
     const [showMain, setShowMain] = useState(false);
     useEffect(() => {
         // Load the apps when the component mounts
@@ -31,33 +33,45 @@ export default function StartBlocked(){
       };
 
       const handleSubmit = () => {
-        const category = {
-            name: customCategoryName,
-            selectedAppIndices: selectedApps,
-          };
-          setCategories([...categories, category]);
-
+        // const category = {
+        //     name: state.customCategoryName,
+        //     selectedAppIndices: selectedApps,
+        //   };
+         // setCategories([...categories, category]);
           // Clear the custom category name and selected apps for the next category
-          setCustomCategoryName('');
-          setSelectedApps([]);
+         // setCustomCategoryName('');
+          //setSelectedApps([]);
           // You can access and use the categories array for further processing
+          
+          dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: state.customCategoryName });
+          dispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
           setShowMain(true);
         };
     return (
         <View>
         {showMain ?
-        ( <MainBlocked categories={categories} apps={apps}/>) :
+        ( <MainBlocked categories={state.categories} apps={apps}/>) :
     (
-        <View>
-        <Pressable  style={styles.button}><Text>Cancel</Text></Pressable>
+        <View  style={styles.appContainer}>
+          <View style={styles.topPart}>
+        <Pressable style={styles.cancel}>
+        <Image
+        source={require('../../../assets/images/cancel.png')}
+      />
+      </Pressable>
         <TextInput
         style={styles.button}
         placeholder="Enter category name"
-        value={customCategoryName}
-        onChangeText={(text) => setCustomCategoryName(text)}
+        placeholderTextColor="#BBC4EC"
+        value={state.customCategoryName}
+        onChangeText={(text) => dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: text })}
       />
-        <Pressable onPress={handleSubmit} style={styles.button}><Text>Submit</Text></Pressable>
-        <ScrollView vertically={true} style={styles.appContainer}>
+        <Pressable onPress={handleSubmit} style={styles.next}>
+           <Image
+        source={require('../../../assets/images/next.png')}
+      /></Pressable>
+      </View>
+        <ScrollView vertically={true}>
     {apps.map((app, idx) => (
      <TouchableOpacity
      key={idx}
@@ -65,7 +79,6 @@ export default function StartBlocked(){
      style={[
         styles.appItem,
         selectedApps.includes(idx) && styles.selectedAppItem,
-            idx === 0 && styles.firstAppItem,
             idx === apps.length - 1 && styles.lastAppItem,
       ]}>
 
@@ -84,16 +97,21 @@ export default function StartBlocked(){
     );
 }
 const styles = StyleSheet.create({
+    next: {
+      alignSelf: 'center',
+    },
+    cancel: {
+      alignSelf: 'center',
+    },
     button: {
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 15,
+        color: '#BBC4EC',
+        fontSize: 16,
     },
     appContainer: {
-      backgroundColor: 'red',
+      backgroundColor: '#3A3D44',
       borderRadius: 17,
-      width: '80%',
-      height: 300,
+      width: '100%',
+      height: '100%',
       marginTop: 20,
       alignSelf: 'center',
     },
@@ -108,9 +126,16 @@ const styles = StyleSheet.create({
     selectedAppItem: {
         backgroundColor: 'blue',
     },
-    firstAppItem: {
+    topPart: {
         borderTopLeftRadius: 17,
         borderTopRightRadius: 17,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderBottomColor: 'black',
+        marginLeft: 20,
+        marginRight: 20,
+        borderBottomWidth: 1,
+        marginVertical: 10,
     },
     lastAppItem: {
         borderBottomLeftRadius: 17,
