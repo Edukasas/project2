@@ -15,7 +15,6 @@ export default function MainBlocked({apps}) {
           <Text>{state.customCategoryName}</Text>
           {state.selectedApps.map((appIndex, appIndexIndex) => (
           <View key={appIndexIndex}>
-            {console.log('app:', apps[state.selectedApps[appIndex]])}
             <Text>{apps[appIndex].label}</Text>
             <Image
               source={{ uri: 'data:image/png;base64,' + apps[appIndex].icon }}

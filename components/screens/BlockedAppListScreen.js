@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import StartBlocked from './Blocked/StartBlocked';
 import MainBlocked from './Blocked/MainBlocked';
+import Time from './Blocked/time';
 import { useCategoryContext } from './Blocked/CategoryContext';
 import { View, StyleSheet } from 'react-native';
 
@@ -24,7 +25,7 @@ export default function BlockedAppScreen({navigation}) {
       ) : (
         <StartBlocked />
       )} */}
-      <StartBlocked/>
+      <Time />
           </View>
     );
 }
