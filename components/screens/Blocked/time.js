@@ -5,7 +5,7 @@ import MainBlocked from './MainBlocked';
 import { useCategoryContext } from './CategoryContext';
 
 export default function Time({apps}){
-        const {dispatch} = useCategoryContext();
+        const {state, dispatch} = useCategoryContext();
         const [showMainblocked, setShowmainBlocked] = useState(false);
         const [UsageMinutes, setUsageMinutes] = useState('');
         const [UsageSeconds, setUsageSeconds] = useState('');
