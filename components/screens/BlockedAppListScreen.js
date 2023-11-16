@@ -20,12 +20,13 @@ export default function BlockedAppScreen({navigation}) {
     console.log('state.selectedApps:', state.selectedApps);
     return (
         <View style={styles.Container}>
+          <StartBlocked />
          {/* {state.selectedApps.length > 0 ? (
         <MainBlocked />
       ) : (
         <StartBlocked />
       )} */}
-      <Time />
+      {/* <Time /> */}
           </View>
     );
 }

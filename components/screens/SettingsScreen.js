@@ -1,6 +1,11 @@
-import {StyleSheet, Image, Text, View} from 'react-native';
+import {StyleSheet, Image, Text, View, NativeModules} from 'react-native';
+
+
 
 export default function SettingsScreen({navigation}) {
+    const {UsageStats} = NativeModules;
+
+    alert(UsageStats.sayHi());
     navigation.setOptions({
         headerStyle: {
           height: 70
