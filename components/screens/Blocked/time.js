@@ -2,20 +2,65 @@
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
 import MainBlocked from './MainBlocked';
-import { InstalledApps } from 'react-native-launcher-kit';
 import { useCategoryContext } from './CategoryContext';
 
-export default function StartBlocked(){
-    const handleSubmit = () => {
-        alert('Hello');
-        };
-        const [numberValue, setNumberValue] = useState('');
-        const handleNumberChange = (text) => {
-            // Handle changes to the number input value
-            setNumberValue(text);
+export default function Time({apps}){
+        const {dispatch} = useCategoryContext();
+        const [showMainblocked, setShowmainBlocked] = useState(false);
+        const [UsageMinutes, setUsageMinutes] = useState('');
+        const [UsageSeconds, setUsageSeconds] = useState('');
+        const [BlockedMinutes, setBlockedMinutes] = useState('');
+        const [BlockedSeconds, setBlockedSeconds] = useState('');
+        const isUsageMinutesSet = UsageMinutes !== '';
+        const isUsageSecondsSet = UsageSeconds !== '';
+        const isBlockedMinutesSet = BlockedMinutes !== '';
+        const isBlockedSecondsSet = BlockedSeconds !== '';
+        const isValidInput = (text) => /^\d+$/.test(text) || text === '';
+        const handleSubmit = () => {
+          if ((isBlockedMinutesSet || isBlockedSecondsSet) && (isUsageMinutesSet || isUsageSecondsSet)){
+            const usageTime = parseInt(UsageMinutes) * 60 + parseInt(UsageSeconds);
+            const blockedTime = parseInt(BlockedMinutes) * 60 + parseInt(BlockedSeconds);
+            setShowmainBlocked(true);
+            dispatch({ type: 'USAGE_TIME', payload: usageTime });
+            dispatch({ type: 'BLOCKED_TIME', payload: blockedTime });
+          }
+          else{
+            alert('Input Time');
+          }
+            };
+            const handleUsageMinutes = (text) => {
+              if (isValidInput(text)) {
+                setUsageMinutes(text);
+              } else {
+                console.error('Invalid input. Please enter only numeric values.');
+              }
+            };
+            const handleUsageSeconds = (text) => {
+              if (isValidInput(text)) {
+                setUsageSeconds(text);
+              } else {
+                console.error('Invalid input. Please enter only numeric values.');
+              }
+            };
+            const handleBlockedMinutes = (text) => {
+            if (isValidInput(text)) {
+              setBlockedMinutes(text);
+            } else {
+              console.error('Invalid input. Please enter only numeric values.');
+            }
+          };
+          const handleBlockedSeconds = (text) => {
+            if (isValidInput(text)) {
+              setBlockedSeconds(text);
+            } else {
+              console.error('Invalid input. Please enter only numeric values.');
+            }
           };
     return (
-        <ScrollView vertically={true} style={styles.timeContainer}>
+      <View>
+        {showMainblocked ?
+      <MainBlocked apps={apps}/> :
+<ScrollView vertically={true} style={styles.timeContainer}>
               <View style={styles.topPart}>
         <Pressable style={styles.cancel}>
         <Image
@@ -33,9 +78,13 @@ export default function StartBlocked(){
         <View>
         <TextInput
         keyboardType="numeric"
-        value={numberValue}
-        onChangeText={handleNumberChange}
+        value={UsageMinutes}
+        onChangeText={handleUsageMinutes}
+        maxLength={2}
         style={styles.block1}
+        placeholder="00"
+        defaultValue="00"
+        placeholderTextColor={styles.placeholderStyleMinutes.color}
       />
       <Text style={styles.name}>Minute</Text>
       </View>
@@ -43,9 +92,13 @@ export default function StartBlocked(){
       <View>
         <TextInput
         keyboardType="numeric"
-        value={numberValue}
-        onChangeText={handleNumberChange}
+        value={UsageSeconds}
+        onChangeText={handleUsageSeconds}
+        maxLength={2}
         style={styles.block2}
+        placeholder="00"
+        defaultValue="00"
+        placeholderTextColor={styles.placeholderStyleSeconds.color}
       />
       <Text style={styles.name}>Second</Text>
       </View>
@@ -55,9 +108,13 @@ export default function StartBlocked(){
         <View>
         <TextInput
         keyboardType="numeric"
-        value={numberValue}
-        onChangeText={handleNumberChange}
+        value={BlockedMinutes}
+        onChangeText={handleBlockedMinutes}
+        maxLength={2}
         style={styles.block1}
+        placeholder="00"
+        defaultValue="00"
+        placeholderTextColor={styles.placeholderStyleMinutes.color}
       />
       <Text style={styles.name}>Minute</Text>
       </View>
@@ -65,17 +122,29 @@ export default function StartBlocked(){
       <View>
         <TextInput
         keyboardType="numeric"
-        value={numberValue}
-        onChangeText={handleNumberChange}
+        value={BlockedSeconds}
+        onChangeText={handleBlockedSeconds}
+        maxLength={2}
         style={styles.block2}
+        placeholder="00"
+        defaultValue="00"
+        placeholderTextColor={styles.placeholderStyleSeconds.color}
       />
       <Text style={styles.name}>Second</Text>
       </View>
       </View>
         </ScrollView>
+      }
+      </View>
 );
 }
 const styles = StyleSheet.create({
+  placeholderStyleSeconds: {
+    color: 'white',
+  },
+  placeholderStyleMinutes: {
+    color: '#94A3E4',
+  },
     biggerblock: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -89,6 +158,7 @@ const styles = StyleSheet.create({
     name: {
         color: '#BBC4EC',
         marginTop: 7,
+        textAlign: 'right',
     },
     block2: {
         paddingBottom: 9,
@@ -103,6 +173,7 @@ const styles = StyleSheet.create({
           borderWidth: 2,
           borderColor: '#94A3E4',
           width: 96,
+          textAlign: 'right',
     },
     block1: {
         paddingBottom: 9,
@@ -117,6 +188,7 @@ const styles = StyleSheet.create({
           borderWidth: 2,
           borderColor: '#94A3E4',
           width: 96,
+          textAlign: 'right',
     },
     timeContainer: {
         backgroundColor: '#191C25',

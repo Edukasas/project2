@@ -1,17 +1,17 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
-import MainBlocked from './MainBlocked';
+import Time from './time';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useCategoryContext } from './CategoryContext';
 
-export default function StartBlocked(){
+export default function Menu(){
     const { state, dispatch } = useCategoryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
     //const [customCategoryName, setCustomCategoryName] = useState('');
     //const [categories, setCategories] = useState([]);
-    const [showMain, setShowMain] = useState(false);
+    const [showTime, setShowTime] = useState(false);
     const [error, setError] = useState(false);
     useEffect(() => {
         const loadApps = async () => {
@@ -32,32 +32,23 @@ export default function StartBlocked(){
       };
 
       const handleSubmit = () => {
-        // const category = {
-        //     name: state.customCategoryName,
-        //     selectedAppIndices: selectedApps,
-        //   };
-         // setCategories([...categories, category]);
-          // Clear the custom category name and selected apps for the next category
-         // setCustomCategoryName('');
-          //setSelectedApps([]);
-          // You can access and use the categories array for further processing
          if (state.customCategoryName.length === 0){
           setError(true);
           }
-         else if(selectedApps.length === 0){
+         else if (selectedApps.length === 0){
           alert('Select atleast 1 app');
          }
           else {
             setError(false);
             dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: state.customCategoryName });
             dispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
-            setShowMain(true);
+            setShowTime(true);
           }
         };
     return (
         <View>
-        {showMain ?
-        ( <MainBlocked categories={state.categories} apps={apps}/>) :
+        {showTime ?
+        ( <Time apps={apps}/>) :
     (
         <View  style={styles.appContainer}>
           <View style={styles.topPart}>
