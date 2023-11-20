@@ -1,12 +1,12 @@
 import { View, StyleSheet} from 'react-native'; // Added missing imports
 import { useEffect, useState} from 'react';
-import Start from './components/Start';
+import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CategoryProvider } from './components/screens/Blocked/CategoryContext';
+import { CategoryProvider } from './components/CategoryContext';
 
 export default function App() {
-  const [page, setPage] = useState('start');
+  const [page, setPage] = useState('Initialization');
 
   const checkIsStarted = async () => {
     try {
@@ -34,8 +34,8 @@ export default function App() {
   return (
     <CategoryProvider>
       <View style={styles.container}>
-        {page === 'start' ? (
-          <Start
+        {page === 'Initialization' ? (
+          <Initialization
             onPress={() => {
               setIsStarted();
               setPage('main');

@@ -5,9 +5,6 @@ import React  from 'react';
 export default function HomeScreen({navigation}) {
   const apps = InstalledApps.getApps();
      navigation.setOptions({
-      headerStyle: {
-        height: 70
-      },
     headerTitle: () => (
       <Image
         source={require('../../assets/images/logo.png')}

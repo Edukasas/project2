@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, Pressable, StyleSheet, View} from 'react-native';
-import Menu from './menu';
+import Menu from './FormComponents/AddAppsForm';
 import { useState} from 'react';
 
 export default function StartBlocked(){

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import  React, {View, Text, StyleSheet, Image} from 'react-native';
-import { useCategoryContext  } from './CategoryContext';
+import { useCategoryContext  } from '../../CategoryContext';
 
 export default function MainBlocked({apps}) {
   const { state } = useCategoryContext();

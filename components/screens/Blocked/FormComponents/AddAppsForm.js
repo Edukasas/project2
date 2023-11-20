@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
-import Time from './time';
+import Time from './TimeForm';
 import { InstalledApps } from 'react-native-launcher-kit';
-import { useCategoryContext } from './CategoryContext';
+import { useCategoryContext } from '../../../CategoryContext';
 
 export default function Menu(){
     const { state, dispatch } = useCategoryContext();
@@ -54,7 +54,7 @@ export default function Menu(){
           <View style={styles.topPart}>
         <Pressable style={styles.cancel}>
         <Image
-        source={require('../../../assets/images/cancel.png')}
+        source={require('../../../../assets/images/cancel.png')}
       />
       </Pressable>
         <TextInput
@@ -69,7 +69,7 @@ export default function Menu(){
   />
         <Pressable onPress={handleSubmit} style={styles.next}>
            <Image
-        source={require('../../../assets/images/next.png')}
+        source={require('../../../../assets/images/next.png')}
       /></Pressable>
       </View>
         <ScrollView vertically={true}>

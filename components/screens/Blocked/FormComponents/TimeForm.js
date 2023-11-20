@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
-import MainBlocked from './MainBlocked';
-import { useCategoryContext } from './CategoryContext';
+import MainBlocked from '../WithAppsContainer';
+import { useCategoryContext } from '../../../CategoryContext';
 
 export default function Time({apps}){
         const {state, dispatch} = useCategoryContext();
@@ -64,13 +64,13 @@ export default function Time({apps}){
               <View style={styles.topPart}>
         <Pressable style={styles.cancel}>
         <Image
-        source={require('../../../assets/images/cancel.png')}
+        source={require('../../../../assets/images/cancel.png')}
       />
       </Pressable>
         <Text style={styles.button}>Enter time</Text>
         <Pressable onPress={handleSubmit} style={styles.next}>
            <Image
-        source={require('../../../assets/images/add.png')}
+        source={require('../../../../assets/images/add.png')}
       /></Pressable>
       </View>
       <Text style={styles.h1}>Usage Time</Text>

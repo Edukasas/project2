@@ -1,11 +1,10 @@
 // IconSources.js
-const homeName = 'Home';
+const HomeName = 'Home';
 const BlockedAppListName = 'Apps Blocked';
 const StatisticsName = 'Statistics';
-const SettingsName = 'Settings';
 
 export const iconSources = {
-  [homeName]: {
+  [HomeName]: {
     active: require('../assets/images/footericons/activehome.png'),
     inactive: require('../assets/images/footericons/home.png'),
   },
@@ -16,10 +15,6 @@ export const iconSources = {
   [StatisticsName]: {
     active: require('../assets/images/footericons/activestatistic.png'),
     inactive: require('../assets/images/footericons/statistic.png'),
-  },
-  [SettingsName]: {
-    active: require('../assets/images/footericons/activesettings.png'),
-    inactive: require('../assets/images/footericons/settings.png'),
   },
 };
 

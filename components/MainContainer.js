@@ -5,15 +5,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Screens
 import HomeScreen from './screens/HomeScreen';
 import BlockedAppScreen from './screens/BlockedAppListScreen';
-import SettingsScreen from './screens/SettingsScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import { iconSources } from './IconSources';
 import { ActiveIcon} from './IconComponents';
 // Screen Names
-const homeName = 'Home';
+const HomeName = 'Home';
 const BlockedAppListName = 'Apps Blocked';
 const StatisticsName = 'Statistics';
-const SettingsName = 'Settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +26,7 @@ export default function MainContainer() {
   return (
     <NavigationContainer theme={MyTheme}>
       <Tab.Navigator
-        initialRouteName={homeName}
+        initialRouteName={HomeName}
         screenOptions={({ route }) => ({
           tabBarStyle: { height: 80, backgroundColor: '#354171' },
           tabBarLabelStyle: { paddingBottom: 16, fontFamily: 'Roboto-Medium' },
@@ -43,14 +41,20 @@ export default function MainContainer() {
             return null;
           },
           tabBarActiveTintColor: 'white', 
-        tabBarInactiveTintColor: '#DDE1FF',          
+        tabBarInactiveTintColor: '#DDE1FF',
+        headerStyle: {
+          height: 70
+        },
+        headerTitleStyle: {
+          fontSize: 22,
+          fontFamily: 'Roboto-Bold',
+        },          
         })}
         
       >
-        <Tab.Screen name={homeName} component={HomeScreen} />
+        <Tab.Screen name={HomeName} component={HomeScreen} />
         <Tab.Screen name={BlockedAppListName} component={BlockedAppScreen} />
         <Tab.Screen name={StatisticsName} component={StatisticsScreen} />
-        <Tab.Screen name={SettingsName} component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
