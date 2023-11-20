@@ -20,7 +20,7 @@ export default function TimeForm({ refresh }){
             const blockedTime = parseInt(BlockedMinutes) * 60 + parseInt(BlockedSeconds);
             dispatch({ type: 'USAGE_TIME', payload: usageTime });
             dispatch({ type: 'BLOCKED_TIME', payload: blockedTime });
-            console.log(usageTime);
+            //console.log(usageTime);
             refresh();
           }
           else{

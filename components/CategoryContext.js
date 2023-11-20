@@ -33,39 +33,47 @@ const categoryReducer = (state, action) => {
         ...state,
         blockedTime: action.payload,
       };
+      case 'HYDRATE_STATE':
+        return {
+          ...state,
+          ...action.payload,
+        };
+      default:
+        return state;
   }
 };
 
 export const CategoryProvider = ({ children }) => {
   const [state, dispatch] = useReducer(categoryReducer, initialState);
-  // useEffect(() => {
-  //   const loadState = async () => {
-  //     try {
-  //       const storedState = await AsyncStorage.getItem('categoryState');
-  //       if (storedState) {
-  //         const parsedState = JSON.parse(storedState);
-  //         dispatch({ type: 'HYDRATE_STATE', payload: parsedState });
-  //       }
-  //     } catch (error) {
-  //       console.error('Error loading state from AsyncStorage:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    const loadState = async () => {
+      try {
+        const storedState = await AsyncStorage.getItem('categoryState');
+        if (storedState) {
+          const parsedState = JSON.parse(storedState);
+          console.log(parsedState);
+          dispatch({ type: 'HYDRATE_STATE', payload: parsedState });
+        }
+      } catch (error) {
+        console.error('Error loading state from AsyncStorage:', error);
+      }
+    };
 
-  //   loadState();
-  // }, []);
+    loadState();
+  }, []);
 
-  // // Save state to AsyncStorage whenever it changes
-  // useEffect(() => {
-  //   const saveState = async () => {
-  //     try {
-  //       await AsyncStorage.setItem('categoryState', JSON.stringify(state));
-  //     } catch (error) {
-  //       console.error('Error saving state to AsyncStorage:', error);
-  //     }
-  //   };
+  // Save state to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveState = async () => {
+      try {
+        await AsyncStorage.setItem('categoryState', JSON.stringify(state));
+      } catch (error) {
+        console.error('Error saving state to AsyncStorage:', error);
+      }
+    };
 
-  //   saveState();
-  // }, [state]);
+    saveState();
+  }, [state]);
   
   return (
     <CategoryContext.Provider value={{ state, dispatch }}>

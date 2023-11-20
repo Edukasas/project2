@@ -3,6 +3,7 @@ import  React, {View, Text, StyleSheet, Image} from 'react-native';
 import { useEffect, useState} from 'react';
 import { useCategoryContext  } from '../../CategoryContext';
 import { InstalledApps } from 'react-native-launcher-kit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WithAppContainer() {
   const { state } = useCategoryContext();
@@ -12,7 +13,9 @@ export default function WithAppContainer() {
   useEffect(() => {
     const loadApps = async () => {
       try {
-        const appList = await InstalledApps.getApps();
+        // Load apps from AsyncStorage
+        const storedApps = await AsyncStorage.getItem('storedApps');
+        const appList = storedApps ? JSON.parse(storedApps) : await InstalledApps.getApps();
         setApps(appList);
       } catch (error) {
         setError(error.message || 'Error fetching apps');
@@ -23,7 +26,6 @@ export default function WithAppContainer() {
 
     loadApps();
   }, []);
-
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -31,6 +33,7 @@ export default function WithAppContainer() {
   if (error) {
     return <Text>Error: {error}</Text>;
   }
+  console.log("AppsContainer", setApps.length);
     return (
       <View style={styles.Container}>
         <View key={state.index} style={styles.block}>

@@ -1,28 +1,29 @@
 /* eslint-disable prettier/prettier */
 import { useCategoryContext } from '../CategoryContext';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddCategory from './Blocked/AddCategory';
 import EmptyAppContainer from './Blocked/EmptyAppsContainer';
 import WithAppContainer from './Blocked/WithAppsContainer';
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showWithApps, setShowWithApps] = useState(false);
+  const { state } = useCategoryContext();
+  const isAppsSelected = state.selectedApps.length > 0;
+  console.log("Blocked App List screen", isAppsSelected);
   const handleCreateAppLimitPress = () => {
     setShowAddCategory(true);
   };
-  const renderingCorrectPage = () => {
-    if(1)setShowWithApps(true);
-    setShowAddCategory(false);
-    console.log(useCategoryContext);
-  }
+  useEffect(() => {
+    setShowWithApps(isAppsSelected);
+  }, [isAppsSelected]);
   const getPressableText = () => {
     return showWithApps ? 'Add more' : 'Create App Limit';
   };
     return (
         <View style={styles.Container}>
  {showAddCategory ? (
-        <AddCategory refresh={renderingCorrectPage}/>
+        <AddCategory refresh={() => setShowWithApps(isAppsSelected)}/>
       ) : (
         <View>
           {showWithApps ? (
