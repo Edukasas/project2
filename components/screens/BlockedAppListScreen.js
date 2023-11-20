@@ -1,23 +1,42 @@
 /* eslint-disable prettier/prettier */
-import StartBlocked from './Blocked/EmptyAppsContainer';
-import MainBlocked from './Blocked/WithAppsContainer';
-import Time from './Blocked/FormComponents/TimeForm';
 import { useCategoryContext } from '../CategoryContext';
-import { View, StyleSheet } from 'react-native';
-
-
-export default function BlockedAppScreen() {
-    const { state } = useCategoryContext();
-    console.log('state.selectedApps:', state.selectedApps);
+import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { useState } from 'react';
+import AddCategory from './Blocked/AddCategory';
+import EmptyAppContainer from './Blocked/EmptyAppsContainer';
+import WithAppContainer from './Blocked/WithAppsContainer';
+export default function BlockedAppListScreen() {
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showWithApps, setShowWithApps] = useState(false);
+  const handleCreateAppLimitPress = () => {
+    setShowAddCategory(true);
+  };
+  const renderingCorrectPage = () => {
+    if(1)setShowWithApps(true);
+    setShowAddCategory(false);
+    console.log(useCategoryContext);
+  }
+  const getPressableText = () => {
+    return showWithApps ? 'Add more' : 'Create App Limit';
+  };
     return (
         <View style={styles.Container}>
-          <StartBlocked />
-         {/* {state.selectedApps.length > 0 ? (
-        <MainBlocked />
+ {showAddCategory ? (
+        <AddCategory refresh={renderingCorrectPage}/>
       ) : (
-        <StartBlocked />
-      )} */}
-      {/* <Time /> */}
+        <View>
+          {showWithApps ? (
+            <WithAppContainer/>
+          ) : (
+          <EmptyAppContainer/>
+          )}
+        <Pressable
+          onPress={handleCreateAppLimitPress}
+          style={styles.button}>
+          <Text style={styles.buttonText}>{getPressableText()}</Text>
+        </Pressable>
+        </View>
+      )}
           </View>
     );
 }
@@ -26,4 +45,19 @@ const styles = StyleSheet.create({
             backgroundColor: 'black',
             flex: 1,
         },
+        button: {
+          backgroundColor: '#14151A',
+          borderRadius: 17,
+          alignSelf: 'center',
+          marginTop: 24,
+      },
+      buttonText: {
+          color: '#BBC4EC',
+          fontFamily: 'Roboto-Bold',
+          alignSelf: 'center',
+          marginTop: 9,
+          marginBottom: 9,
+          marginLeft: 29,
+          marginRight: 29,
+      },
 });

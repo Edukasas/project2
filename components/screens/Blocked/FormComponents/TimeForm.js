@@ -1,12 +1,10 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
-import { useEffect, useState} from 'react';
-import MainBlocked from '../WithAppsContainer';
+import { useState} from 'react';
 import { useCategoryContext } from '../../../CategoryContext';
 
-export default function Time({apps}){
+export default function TimeForm({ refresh }){
         const {state, dispatch} = useCategoryContext();
-        const [showMainblocked, setShowmainBlocked] = useState(false);
         const [UsageMinutes, setUsageMinutes] = useState('');
         const [UsageSeconds, setUsageSeconds] = useState('');
         const [BlockedMinutes, setBlockedMinutes] = useState('');
@@ -20,9 +18,10 @@ export default function Time({apps}){
           if ((isBlockedMinutesSet || isBlockedSecondsSet) && (isUsageMinutesSet || isUsageSecondsSet)){
             const usageTime = parseInt(UsageMinutes) * 60 + parseInt(UsageSeconds);
             const blockedTime = parseInt(BlockedMinutes) * 60 + parseInt(BlockedSeconds);
-            setShowmainBlocked(true);
             dispatch({ type: 'USAGE_TIME', payload: usageTime });
             dispatch({ type: 'BLOCKED_TIME', payload: blockedTime });
+            console.log(usageTime);
+            refresh();
           }
           else{
             alert('Input Time');
@@ -57,9 +56,8 @@ export default function Time({apps}){
             }
           };
     return (
-      <View>
-        {showMainblocked ?
-      <MainBlocked apps={apps}/> :
+   
+
 <ScrollView vertically={true} style={styles.timeContainer}>
               <View style={styles.topPart}>
         <Pressable style={styles.cancel}>
@@ -134,8 +132,6 @@ export default function Time({apps}){
       </View>
       </View>
         </ScrollView>
-      }
-      </View>
 );
 }
 const styles = StyleSheet.create({

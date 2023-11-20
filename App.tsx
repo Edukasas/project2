@@ -45,7 +45,6 @@ export default function App() {
           <MainContainer />
         )}
       </View>
-      <Text>Test</Text>
     </CategoryProvider>
   );
 }

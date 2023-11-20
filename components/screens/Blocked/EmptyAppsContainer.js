@@ -1,18 +1,8 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, Pressable, StyleSheet, View} from 'react-native';
-import Menu from './FormComponents/AddAppsForm';
-import { useState} from 'react';
 
-export default function StartBlocked(){
-    const [showMenu, setShowMenu] = useState(false);
-    const navigateToMenu = () => {
-      setShowMenu(true);
-    };
+export default function EmptyAppContainer(){
      return(
-     <View>
-      {showMenu ? (
-        <Menu/>
-      ) : (
         <View>
      <Image
         source={require('../../../assets/images/app_blocking.png')}
@@ -20,16 +10,8 @@ export default function StartBlocked(){
       />
             <Text style={styles.Text1}>No app limits created.</Text>
             <Text style={styles.Text2}>App limits enable you to use specific apps, block them for a set period, and then resume using them.</Text>
-            <Pressable
-            onPress={navigateToMenu}
-              style={styles.button}>
-                <Text style={styles.buttonText}>Create app limit</Text>
-              </Pressable>
               </View>
       )}
-          </View>
-    );
-}
 const styles = StyleSheet.create({
     appContainer: {
       backgroundColor: 'red',
@@ -73,20 +55,5 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: 248,
         lineHeight: 17,
-    },
-    button: {
-        backgroundColor: '#14151A',
-        borderRadius: 17,
-        alignSelf: 'center',
-        marginTop: 24,
-    },
-    buttonText: {
-        color: '#BBC4EC',
-        fontFamily: 'Roboto-Bold',
-        alignSelf: 'center',
-        marginTop: 9,
-        marginBottom: 9,
-        marginLeft: 29,
-        marginRight: 29,
     },
 });

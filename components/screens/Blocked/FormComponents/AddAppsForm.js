@@ -1,17 +1,13 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
-import Time from './TimeForm';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useCategoryContext } from '../../../CategoryContext';
 
-export default function Menu(){
+export default function AddAppsForm({ onSubmit, refresh }){
     const { state, dispatch } = useCategoryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
-    //const [customCategoryName, setCustomCategoryName] = useState('');
-    //const [categories, setCategories] = useState([]);
-    const [showTime, setShowTime] = useState(false);
     const [error, setError] = useState(false);
     useEffect(() => {
         const loadApps = async () => {
@@ -42,14 +38,13 @@ export default function Menu(){
             setError(false);
             dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: state.customCategoryName });
             dispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
-            setShowTime(true);
+            if (onSubmit) {
+               onSubmit();
+            }
           }
         };
     return (
-        <View>
-        {showTime ?
-        ( <Time apps={apps}/>) :
-    (
+
         <View  style={styles.appContainer}>
           <View style={styles.topPart}>
         <Pressable style={styles.cancel}>
@@ -93,9 +88,6 @@ export default function Menu(){
   </ScrollView>
   </View>
     )}
-        </View>
-    );
-}
 const styles = StyleSheet.create({
     next: {
       alignSelf: 'center',
