@@ -51,7 +51,6 @@ export const CategoryProvider = ({ children }) => {
         const storedState = await AsyncStorage.getItem('categoryState');
         if (storedState) {
           const parsedState = JSON.parse(storedState);
-          console.log(parsedState);
           dispatch({ type: 'HYDRATE_STATE', payload: parsedState });
         }
       } catch (error) {

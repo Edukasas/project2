@@ -3,7 +3,7 @@ import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pre
 import { useState} from 'react';
 import { useCategoryContext } from '../../../CategoryContext';
 
-export default function TimeForm({ refresh }){
+export default function TimeForm({ update, returnToApps }){
         const {state, dispatch} = useCategoryContext();
         const [UsageMinutes, setUsageMinutes] = useState('');
         const [UsageSeconds, setUsageSeconds] = useState('');
@@ -20,12 +20,14 @@ export default function TimeForm({ refresh }){
             const blockedTime = parseInt(BlockedMinutes) * 60 + parseInt(BlockedSeconds);
             dispatch({ type: 'USAGE_TIME', payload: usageTime });
             dispatch({ type: 'BLOCKED_TIME', payload: blockedTime });
-            //console.log(usageTime);
-            refresh();
+            update();
           }
           else{
-            alert('Input Time');
+            alert('Input Value');
           }
+        };
+          const handleCancel = () => {
+            returnToApps();
             };
             const handleUsageMinutes = (text) => {
               if (isValidInput(text)) {
@@ -60,7 +62,7 @@ export default function TimeForm({ refresh }){
 
 <ScrollView vertically={true} style={styles.timeContainer}>
               <View style={styles.topPart}>
-        <Pressable style={styles.cancel}>
+        <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image
         source={require('../../../../assets/images/cancel.png')}
       />
@@ -222,4 +224,4 @@ const styles = StyleSheet.create({
         paddingTop: 16,
         paddingBottom: 16,
     },
-})
+});

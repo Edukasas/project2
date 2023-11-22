@@ -4,16 +4,19 @@ import { View } from 'react-native';
 import AddAppsForm from './FormComponents/AddAppsForm';
 import TimeForm from './FormComponents/TimeForm';
 
-const AddCategory = ({ refresh }) => {
+const AddCategory = ({ update, onCancel }) => {
+
   const [showTimeForm, setShowTimeForm] = useState(false);
   const handleAddAppsSubmit = () => {
     setShowTimeForm(true);
   };
+  const handleReturn = () => {
+    setShowTimeForm(false);
+  };
   return (
     <View>
       {showTimeForm ?
-       <TimeForm refresh={refresh} /> : <AddAppsForm onSubmit={handleAddAppsSubmit} refresh={refresh} /> }
-
+       <TimeForm update={update} returnToApps={handleReturn} /> : <AddAppsForm onSubmit={handleAddAppsSubmit} onCancel={onCancel} /> }
     </View>
   );
 };

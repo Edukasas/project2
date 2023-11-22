@@ -2,22 +2,31 @@
 import  React, {View, Text, StyleSheet, Image} from 'react-native';
 import { useEffect, useState} from 'react';
 import { useCategoryContext  } from '../../CategoryContext';
-import { InstalledApps } from 'react-native-launcher-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { InstalledApps } from 'react-native-launcher-kit';
 
 export default function WithAppContainer() {
   const { state } = useCategoryContext();
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [Category, setCategory] = useState(null);
+  useEffect(() => {
+    const loadApps = async () => {
+        const appList = await InstalledApps.getApps();
+        setApps(appList);
+    };
+    loadApps();
+  }, []);
+  console.log(apps.map(app => app.index));
   useEffect(() => {
     const loadApps = async () => {
       try {
         // Load apps from AsyncStorage
-        const storedApps = await AsyncStorage.getItem('storedApps');
-        const appList = storedApps ? JSON.parse(storedApps) : await InstalledApps.getApps();
-        setApps(appList);
-      } catch (error) {
+        const Category = await AsyncStorage.getItem('categoryState');
+        const CategoryArray  = Category ? JSON.parse(Category) : [];
+        setCategory(CategoryArray);
+     } catch (error) {
         setError(error.message || 'Error fetching apps');
       } finally {
         setLoading(false);
@@ -26,6 +35,16 @@ export default function WithAppContainer() {
 
     loadApps();
   }, []);
+  const selectedAppIndex = Category.selectedApps[0];
+  console.log("Selected App Index:", selectedAppIndex);
+  //const selectedApp = apps.find(app => app.index === selectedAppIndex);
+
+  // if (selectedApp) {
+  //   const icon = selectedApp.icon;
+  //   console.log("Icon:", icon);
+  // } else{
+  //   console.log("App not found");
+  // }
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -38,12 +57,11 @@ export default function WithAppContainer() {
       <View style={styles.Container}>
         <View key={state.index} style={styles.block}>
             <Image
-              source={{ uri: 'data:image/png;base64,' + apps[0].icon }}
+             // source={{ uri: 'data:image/png;base64,' + app[selectedApp[0]].icon }}
               style={styles.img}
             />
             <Text style={styles.text}>{state.customCategoryName}</Text>
         </View>
-
     </View>
     );
   }

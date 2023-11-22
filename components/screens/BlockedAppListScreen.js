@@ -10,20 +10,26 @@ export default function BlockedAppListScreen() {
   const [showWithApps, setShowWithApps] = useState(false);
   const { state } = useCategoryContext();
   const isAppsSelected = state.selectedApps.length > 0;
-  console.log("Blocked App List screen", isAppsSelected);
-  const handleCreateAppLimitPress = () => {
-    setShowAddCategory(true);
-  };
   useEffect(() => {
     setShowWithApps(isAppsSelected);
-  }, [isAppsSelected]);
-  const getPressableText = () => {
-    return showWithApps ? 'Add more' : 'Create App Limit';
-  };
-    return (
-        <View style={styles.Container}>
- {showAddCategory ? (
-        <AddCategory refresh={() => setShowWithApps(isAppsSelected)}/>
+  }, [state.selectedApps]);
+    const handleCreateAppLimitPress = () => {
+      setShowAddCategory(true);
+    };
+    const handleCancel = () => {
+      setShowAddCategory(false);
+    };
+    const handleUpdate = () => {
+      setShowWithApps(isAppsSelected);
+      setShowAddCategory(false);
+    }
+    const getPressableText = () => {
+      return showWithApps ? 'Add more' : 'Create App Limit';
+    };
+      return (
+          <View style={styles.Container}>
+  {showAddCategory ? (
+          <AddCategory update={handleUpdate} onCancel={handleCancel}/>
       ) : (
         <View>
           {showWithApps ? (

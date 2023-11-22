@@ -4,7 +4,7 @@ import { useEffect, useState} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useCategoryContext } from '../../../CategoryContext';
 
-export default function AddAppsForm({ onSubmit, refresh }){
+export default function AddAppsForm({ onSubmit, onCancel }){
     const { state, dispatch } = useCategoryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
@@ -43,11 +43,14 @@ export default function AddAppsForm({ onSubmit, refresh }){
             }
           }
         };
+        const handleCancel = () => {
+          onCancel();
+        };
     return (
 
         <View  style={styles.appContainer}>
           <View style={styles.topPart}>
-        <Pressable style={styles.cancel}>
+        <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image
         source={require('../../../../assets/images/cancel.png')}
       />
