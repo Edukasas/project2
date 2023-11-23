@@ -73,7 +73,7 @@ export const CategoryProvider = ({ children }) => {
 
     saveState();
   }, [state]);
-  
+
   return (
     <CategoryContext.Provider value={{ state, dispatch }}>
       {children}

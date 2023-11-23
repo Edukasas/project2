@@ -4,7 +4,7 @@ import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CategoryProvider } from './components/CategoryContext';
-
+import  AppStorage  from './components/AppStorage';
 export default function App() {
   const [page, setPage] = useState('Initialization');
 
