@@ -13,7 +13,6 @@ export default function WithAppContainer() {
   const [installedApps, setInstalledApps] = useState([]);
   const firstSelectedAppIndex = Category?.selectedApps[0];
   const firstSelectedApp = installedApps[firstSelectedAppIndex];
-  console.log('idx', firstSelectedApp?.icon);
   useEffect(() => {
     const loadData = async () => {
       try {
