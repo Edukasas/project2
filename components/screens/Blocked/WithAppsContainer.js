@@ -1,12 +1,11 @@
 /* eslint-disable prettier/prettier */
 import React, { View, Text, StyleSheet, Image } from 'react-native';
 import { useEffect, useState } from 'react';
-import { useCategoryContext } from '../../CategoryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
 export default function WithAppContainer() {
-  const { state } = useCategoryContext();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [Category, setCategory] = useState(null);
@@ -57,12 +56,12 @@ export default function WithAppContainer() {
 
   return (
     <View style={styles.Container}>
-      <View key={state.index} style={styles.block}>
+      <View key={Category?.index} style={styles.block}>
        <Image
           source={{ uri: `data:image/png;base64,${firstSelectedApp?.icon}` }}
           style={styles.img}
         /> 
-        <Text style={styles.text}>{state.customCategoryName}</Text>
+        <Text style={styles.text}>{Category?.customCategoryName}</Text>
       </View>
     </View>
   );

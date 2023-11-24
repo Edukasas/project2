@@ -3,9 +3,11 @@ import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pre
 import { useEffect, useState} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useCategoryContext } from '../../../CategoryContext';
+import { useTemporaryContext } from '../../../TemporaryContext';
 
 export default function AddAppsForm({ onSubmit, onCancel }){
     const { dispatch } = useCategoryContext();
+    const { temporaryState, temporaryDispatch } = useTemporaryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
     const [error, setError] = useState(false);
@@ -30,7 +32,7 @@ export default function AddAppsForm({ onSubmit, onCancel }){
       };
 
       const handleSubmit = () => {
-         if (inputText.trim().length === 0){
+         if (temporaryState.customCategoryName.trim().length === 0){
           setError(true);
           }
          else if (selectedApps.length === 0){
@@ -40,6 +42,8 @@ export default function AddAppsForm({ onSubmit, onCancel }){
             setError(false);
             dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: inputText });
             dispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
+            temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: inputText });
+            temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
             if (onSubmit) {
                onSubmit();
             }
@@ -49,7 +53,6 @@ export default function AddAppsForm({ onSubmit, onCancel }){
           onCancel();
         };
     return (
-
         <View  style={styles.appContainer}>
           <View style={styles.topPart}>
         <Pressable onPress={handleCancel} style={styles.cancel}>
@@ -61,9 +64,11 @@ export default function AddAppsForm({ onSubmit, onCancel }){
           style={[styles.button, error && styles.errorInput]}
           placeholder="Enter category name"
           placeholderTextColor={error ? 'red' : '#BBC4EC'}
-          value={inputText}
+          value={temporaryState.customCategoryName}
           maxLength={20}
-          onChangeText={(text) => setInputText(text)}
+          onChangeText={(text) => {
+            temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: text });
+        }}
   />
         <Pressable onPress={handleSubmit} style={styles.next}>
            <Image

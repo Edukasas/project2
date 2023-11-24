@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useCategoryContext } from '../CategoryContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import AddCategory from './Blocked/AddCategory';
@@ -7,12 +7,22 @@ import EmptyAppContainer from './Blocked/EmptyAppsContainer';
 import WithAppContainer from './Blocked/WithAppsContainer';
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
-  const [showWithApps, setShowWithApps] = useState(false);
-  const { state } = useCategoryContext();
-  const isAppsSelected = state.selectedApps.length > 0;
+  const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
+
+
   useEffect(() => {
-    setShowWithApps(isAppsSelected);
-  }, [state.selectedApps]);
+    const checkStoredData = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem('categoryState');
+        setIsStoredDataAvailable(!!storedData);
+      } catch (error) {
+        console.error('Error checking stored data:', error);
+      }
+    };
+
+    checkStoredData();
+  }, []);
+
     const handleCreateAppLimitPress = () => {
       setShowAddCategory(true);
     };
@@ -20,11 +30,11 @@ export default function BlockedAppListScreen() {
       setShowAddCategory(false);
     };
     const handleUpdate = () => {
-      setShowWithApps(isAppsSelected);
+      setIsStoredDataAvailable(true);
       setShowAddCategory(false);
     }
     const getPressableText = () => {
-      return showWithApps ? 'Add more' : 'Create App Limit';
+      return isStoredDataAvailable ? 'Add more' : 'Create App Limit';
     };
       return (
           <View style={styles.Container}>
@@ -32,7 +42,7 @@ export default function BlockedAppListScreen() {
           <AddCategory update={handleUpdate} onCancel={handleCancel}/>
       ) : (
         <View>
-          {showWithApps ? (
+          {isStoredDataAvailable ? (
             <WithAppContainer/>
           ) : (
           <EmptyAppContainer/>

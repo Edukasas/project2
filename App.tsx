@@ -3,8 +3,7 @@ import { useEffect, useState} from 'react';
 import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CategoryProvider } from './components/CategoryContext';
-import  AppStorage  from './components/AppStorage';
+
 export default function App() {
   const [page, setPage] = useState('Initialization');
 
@@ -28,11 +27,11 @@ export default function App() {
   }
 
   useEffect(() => {
-    checkIsStarted(); // Check if 'isStarted' exists when the component mounts
-  }, []); // The empty dependency array ensures this effect runs once
+    checkIsStarted(); 
+  }, []); 
 
   return (
-    <CategoryProvider>
+
       <View style={styles.container}>
         {page === 'Initialization' ? (
           <Initialization
@@ -45,7 +44,6 @@ export default function App() {
           <MainContainer />
         )}
       </View>
-    </CategoryProvider>
   );
 }
 
