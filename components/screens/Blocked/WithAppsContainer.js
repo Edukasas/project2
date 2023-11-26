@@ -28,7 +28,6 @@ export default function WithAppContainer() {
 
     loadData();
   }, []);
-
   useEffect(() => {
     const fetchInstalledApps = async () => {
       try {

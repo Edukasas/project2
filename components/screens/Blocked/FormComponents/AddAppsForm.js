@@ -2,33 +2,32 @@
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useEffect, useState} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
-import { useCategoryContext } from '../../../CategoryContext';
 import { useTemporaryContext } from '../../../TemporaryContext';
 
 export default function AddAppsForm({ onSubmit, onCancel }){
-    const { dispatch } = useCategoryContext();
     const { temporaryState, temporaryDispatch } = useTemporaryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
     const [error, setError] = useState(false);
-    const [inputText, setInputText] = useState('');
 
     useEffect(() => {
         const loadApps = async () => {
             const appList = await InstalledApps.getApps();
             setApps(appList);
+
+            setSelectedApps(temporaryState.selectedApps);
         };
         loadApps();
       }, []);
 
+ 
       const toggleAppSelection = (idx) => {
-        if (selectedApps.includes(idx)) {
-          // If the app is already selected, remove it from the selection
-          setSelectedApps(selectedApps.filter((selectedIdx) => selectedIdx !== idx));
-        } else {
-          // If the app is not selected, add it to the selection
-          setSelectedApps([...selectedApps, idx]);
-        }
+        const updatedSelectedApps = selectedApps.includes(idx)
+          ? selectedApps.filter((selectedIdx) => selectedIdx !== idx)
+          : [...selectedApps, idx];
+    
+        setSelectedApps(updatedSelectedApps);
+        temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: updatedSelectedApps });
       };
 
       const handleSubmit = () => {
@@ -40,9 +39,6 @@ export default function AddAppsForm({ onSubmit, onCancel }){
          }
           else {
             setError(false);
-            dispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: inputText });
-            dispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
-            temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: inputText });
             temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: selectedApps });
             if (onSubmit) {
                onSubmit();

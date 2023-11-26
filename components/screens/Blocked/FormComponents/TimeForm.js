@@ -1,25 +1,38 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
 import { useState} from 'react';
-import { useCategoryContext } from '../../../CategoryContext';
+import { useTemporaryContext } from '../../../TemporaryContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TimeForm({ update, returnToApps }){
-        const {state, dispatch} = useCategoryContext();
-        const [UsageMinutes, setUsageMinutes] = useState('');
-        const [UsageSeconds, setUsageSeconds] = useState('');
-        const [BlockedMinutes, setBlockedMinutes] = useState('');
-        const [BlockedSeconds, setBlockedSeconds] = useState('');
-        const isUsageMinutesSet = UsageMinutes !== '';
-        const isUsageSecondsSet = UsageSeconds !== '';
-        const isBlockedMinutesSet = BlockedMinutes !== '';
-        const isBlockedSecondsSet = BlockedSeconds !== '';
+        const { temporaryState, temporaryDispatch } = useTemporaryContext();
+        const UsageMinutes = temporaryState.usageTimeMinutes;
+        const UsageSeconds = temporaryState.usageTimeSeconds;
+        const BlockedMinutes = temporaryState.blockedTimeMinutes;
+        const BlockedSeconds = temporaryState.blockedTimeMinutes;
         const isValidInput = (text) => /^\d+$/.test(text) || text === '';
-        const handleSubmit = () => {
-          if ((isBlockedMinutesSet || isBlockedSecondsSet) && (isUsageMinutesSet || isUsageSecondsSet)){
-            const usageTime = parseInt(UsageMinutes) * 60 + parseInt(UsageSeconds);
-            const blockedTime = parseInt(BlockedMinutes) * 60 + parseInt(BlockedSeconds);
-            dispatch({ type: 'USAGE_TIME', payload: usageTime });
-            dispatch({ type: 'BLOCKED_TIME', payload: blockedTime });
+        const handleSubmit = async() => {
+          if ((UsageMinutes || UsageSeconds) && (BlockedMinutes || BlockedSeconds)){
+            const parsedUsageMinutes = parseInt(UsageMinutes) || 0;
+            const parsedUsageSeconds = parseInt(UsageSeconds) || 0;
+            const parsedBlockedMinutes = parseInt(BlockedMinutes) || 0;
+            const parsedBlockedSeconds = parseInt(BlockedSeconds) || 0;
+          
+            const usageTime = parsedUsageMinutes * 60 + parsedUsageSeconds;
+            const blockedTime = parsedBlockedMinutes * 60 + parsedBlockedSeconds;
+
+                try {
+                  const categoryState = {
+                    customCategoryName: temporaryState.customCategoryName,
+                    selectedApps: temporaryState.selectedApps,
+                    usageTime,
+                    blockedTime,
+                  };
+                  await AsyncStorage.setItem('categoryState', JSON.stringify(categoryState));
+                } catch (error) {
+                  console.error('Error saving state to AsyncStorage:', error);
+                }
+
             update();
           }
           else{
@@ -31,28 +44,28 @@ export default function TimeForm({ update, returnToApps }){
             };
             const handleUsageMinutes = (text) => {
               if (isValidInput(text)) {
-                setUsageMinutes(text);
+                temporaryDispatch({ type: 'USAGE_TIME_MINUTES', payload: text});
               } else {
                 console.error('Invalid input. Please enter only numeric values.');
               }
             };
             const handleUsageSeconds = (text) => {
               if (isValidInput(text)) {
-                setUsageSeconds(text);
+                temporaryDispatch({ type: 'USAGE_TIME_SECONDS', payload: text});
               } else {
                 console.error('Invalid input. Please enter only numeric values.');
               }
             };
             const handleBlockedMinutes = (text) => {
             if (isValidInput(text)) {
-              setBlockedMinutes(text);
+              temporaryDispatch({ type: 'BLOCKED_TIME_MINUTES', payload: text});
             } else {
               console.error('Invalid input. Please enter only numeric values.');
             }
           };
           const handleBlockedSeconds = (text) => {
             if (isValidInput(text)) {
-              setBlockedSeconds(text);
+              temporaryDispatch({ type: 'BLOCKED_TIME_SECONDS', payload: text});
             } else {
               console.error('Invalid input. Please enter only numeric values.');
             }
@@ -64,7 +77,7 @@ export default function TimeForm({ update, returnToApps }){
               <View style={styles.topPart}>
         <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image
-        source={require('../../../../assets/images/cancel.png')}
+        source={require('../../../../assets/images/back.png')}
       />
       </Pressable>
         <Text style={styles.button}>Enter time</Text>
@@ -78,12 +91,11 @@ export default function TimeForm({ update, returnToApps }){
         <View>
         <TextInput
         keyboardType="numeric"
-        value={UsageMinutes}
+        value={temporaryState.usageTimeMinutes}
         onChangeText={handleUsageMinutes}
         maxLength={2}
         style={styles.block1}
         placeholder="00"
-        defaultValue="00"
         placeholderTextColor={styles.placeholderStyleMinutes.color}
       />
       <Text style={styles.name}>Minute</Text>
@@ -92,12 +104,11 @@ export default function TimeForm({ update, returnToApps }){
       <View>
         <TextInput
         keyboardType="numeric"
-        value={UsageSeconds}
+        value={temporaryState.usageTimeSeconds}
         onChangeText={handleUsageSeconds}
         maxLength={2}
         style={styles.block2}
         placeholder="00"
-        defaultValue="00"
         placeholderTextColor={styles.placeholderStyleSeconds.color}
       />
       <Text style={styles.name}>Second</Text>
@@ -108,12 +119,11 @@ export default function TimeForm({ update, returnToApps }){
         <View>
         <TextInput
         keyboardType="numeric"
-        value={BlockedMinutes}
+        value={temporaryState.blockedTimeMinutes}
         onChangeText={handleBlockedMinutes}
         maxLength={2}
         style={styles.block1}
         placeholder="00"
-        defaultValue="00"
         placeholderTextColor={styles.placeholderStyleMinutes.color}
       />
       <Text style={styles.name}>Minute</Text>
@@ -122,12 +132,11 @@ export default function TimeForm({ update, returnToApps }){
       <View>
         <TextInput
         keyboardType="numeric"
-        value={BlockedSeconds}
+        value={temporaryState.blockedTimeSeconds}
         onChangeText={handleBlockedSeconds}
         maxLength={2}
         style={styles.block2}
         placeholder="00"
-        defaultValue="00"
         placeholderTextColor={styles.placeholderStyleSeconds.color}
       />
       <Text style={styles.name}>Second</Text>
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'black',
         marginLeft: 20,
         marginRight: 20,
-        paddingTop: 16,
+        paddingTop: 21,
         paddingBottom: 16,
     },
 });

@@ -1,8 +1,9 @@
-import { View, StyleSheet} from 'react-native'; // Added missing imports
+import { View, StyleSheet, Platform} from 'react-native'; // Added missing imports
 import { useEffect, useState} from 'react';
 import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KeyboardAvoidingView } from 'react-native';
 
 export default function App() {
   const [page, setPage] = useState('Initialization');
@@ -31,7 +32,12 @@ export default function App() {
   }, []); 
 
   return (
-
+    <KeyboardAvoidingView
+    enabled={true}
+    behavior={'height'}
+    keyboardVerticalOffset={-100}
+     style={styles.keyboard}
+  >
       <View style={styles.container}>
         {page === 'Initialization' ? (
           <Initialization
@@ -44,11 +50,15 @@ export default function App() {
           <MainContainer />
         )}
       </View>
+      </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  keyboard: {
     flex: 1,
   },
 });

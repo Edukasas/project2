@@ -9,7 +9,7 @@ export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
 
-
+ 
   useEffect(() => {
     const checkStoredData = async () => {
       try {

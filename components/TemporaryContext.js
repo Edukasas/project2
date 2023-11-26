@@ -21,16 +21,26 @@ const temporaryReducer = (state, action) => {
           ...state,
           selectedApps: action.payload,
         };
-      case 'USAGE_TIME':
+      case 'USAGE_TIME_MINUTES':
         return {
           ...state,
-          usageTime: action.payload,
+          usageTimeMinutes: action.payload,
         };
-      case 'BLOCKED_TIME':
+      case 'BLOCKED_TIME_MINUTES':
         return {
           ...state,
-          blockedTime: action.payload,
+          blockedTimeMinutes: action.payload,
         };
+        case 'USAGE_TIME_SECONDS':
+          return {
+            ...state,
+            usageTimeSeconds: action.payload,
+          };
+        case 'BLOCKED_TIME_SECONDS':
+          return {
+            ...state,
+            blockedTimeSeconds: action.payload,
+          };
         case 'RESET_TEMPORARY_DATA':
             return temporaryInitialState;
     default:
@@ -43,7 +53,6 @@ export const TemporaryProvider = ({ children }) => {
     temporaryReducer,
     temporaryInitialState
   );
-
   return (
     <TemporaryContext.Provider value={{ temporaryState, temporaryDispatch }}>
       {children}
