@@ -1,16 +1,33 @@
 /* eslint-disable prettier/prettier */
 import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
-import { useState} from 'react';
+import { useState,useEffect} from 'react';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TimeForm({ update, returnToApps }){
         const { temporaryState, temporaryDispatch } = useTemporaryContext();
+        const [categories, setCategories] = useState([]);
         const UsageMinutes = temporaryState.usageTimeMinutes;
         const UsageSeconds = temporaryState.usageTimeSeconds;
         const BlockedMinutes = temporaryState.blockedTimeMinutes;
         const BlockedSeconds = temporaryState.blockedTimeMinutes;
         const isValidInput = (text) => /^\d+$/.test(text) || text === '';
+
+        useEffect(() => {
+          const loadData = async () => {
+            try {
+              // Load category from AsyncStorage
+              const storedCategory = await AsyncStorage.getItem('categories');
+              const parsedCategory = storedCategory ? JSON.parse(storedCategory) : [];
+              console.log(storedCategory);
+              setCategories(parsedCategory);
+            } catch (categoryError) {
+              console.error('Error fetching category:', categoryError);
+            } 
+          };
+          loadData();
+        }, []);
+
         const handleSubmit = async() => {
           if ((UsageMinutes || UsageSeconds) && (BlockedMinutes || BlockedSeconds)){
             const parsedUsageMinutes = parseInt(UsageMinutes) || 0;
@@ -22,13 +39,15 @@ export default function TimeForm({ update, returnToApps }){
             const blockedTime = parsedBlockedMinutes * 60 + parsedBlockedSeconds;
 
                 try {
-                  const categoryState = {
+                  const newCategory = {
                     customCategoryName: temporaryState.customCategoryName,
                     selectedApps: temporaryState.selectedApps,
                     usageTime,
                     blockedTime,
                   };
-                  await AsyncStorage.setItem('categoryState', JSON.stringify(categoryState));
+                  const updatedCategories = [...categories, newCategory];
+                  await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
+                  setCategories(updatedCategories);
                 } catch (error) {
                   console.error('Error saving state to AsyncStorage:', error);
                 }
@@ -73,7 +92,7 @@ export default function TimeForm({ update, returnToApps }){
     return (
    
 
-<ScrollView vertically={true} style={styles.timeContainer}>
+<ScrollView vertically={true} style={styles.timeContainer} keyboardShouldPersistTaps="handled">
               <View style={styles.topPart}>
         <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image

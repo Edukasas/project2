@@ -28,7 +28,7 @@ export default function MainContainer() {
       <Tab.Navigator
         initialRouteName={HomeName}
         screenOptions={({ route }) => ({
-          tabBarStyle: { height: 80, backgroundColor: '#354171' },
+          tabBarStyle: { height: 80, backgroundColor: '#354171'},
           tabBarLabelStyle: { paddingBottom: 16, fontFamily: 'Roboto-Medium' },
           tabBarIcon: ({ focused }) => {
             const rn = route.name;

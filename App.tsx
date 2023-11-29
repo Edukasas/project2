@@ -1,4 +1,4 @@
-import { View, StyleSheet, Platform} from 'react-native'; // Added missing imports
+import { View, StyleSheet, Image } from 'react-native'; // Added missing imports
 import { useEffect, useState} from 'react';
 import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
@@ -7,6 +7,7 @@ import { KeyboardAvoidingView } from 'react-native';
 
 export default function App() {
   const [page, setPage] = useState('Initialization');
+  const [loading, setLoading] = useState(true);
 
   const checkIsStarted = async () => {
     try {
@@ -16,6 +17,8 @@ export default function App() {
       }
     } catch (e) {
       // Handle errors if necessary
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -39,7 +42,14 @@ export default function App() {
      style={styles.keyboard}
   >
       <View style={styles.container}>
-        {page === 'Initialization' ? (
+        {loading ? (
+          <View style={styles.customLoadingBg}>
+        <Image
+        source={require('./assets/images/ic_launcher.png')}
+        style={styles.customLoadingImage}
+      />
+      </View>
+        ) : page === 'Initialization' ? (
           <Initialization
             onPress={() => {
               setIsStarted();
@@ -60,5 +70,16 @@ const styles = StyleSheet.create({
   },
   keyboard: {
     flex: 1,
+  },
+  // Reikia ideti icon, kai loadina
+  customLoadingBg: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#354171',
+  },
+  customLoadingImage: {
+    width: 100,
+    height: 100,
   },
 });

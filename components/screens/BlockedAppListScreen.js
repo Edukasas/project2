@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, StyleSheet, Pressable, Text, Animated } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import AddCategory from './Blocked/AddCategory';
 import EmptyAppContainer from './Blocked/EmptyAppsContainer';
 import WithAppContainer from './Blocked/WithAppsContainer';
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
-
+  const fadeAnim = useRef(new Animated.Value(0)).current;
  
   useEffect(() => {
     const checkStoredData = async () => {
@@ -36,11 +36,20 @@ export default function BlockedAppListScreen() {
     const getPressableText = () => {
       return isStoredDataAvailable ? 'Add more' : 'Create App Limit';
     };
+    useEffect(() => {
+      // Fade in when isStoredDataAvailable becomes true
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500, // Adjust the duration as needed
+        useNativeDriver: false, // Add this line if you are not using RN 0.63+
+      }).start();
+    }, [isStoredDataAvailable, fadeAnim]);
       return (
           <View style={styles.Container}>
   {showAddCategory ? (
           <AddCategory update={handleUpdate} onCancel={handleCancel}/>
       ) : (
+        <Animated.View style={{ opacity: fadeAnim }}>
         <View>
           {isStoredDataAvailable ? (
             <WithAppContainer/>
@@ -53,6 +62,7 @@ export default function BlockedAppListScreen() {
           <Text style={styles.buttonText}>{getPressableText()}</Text>
         </Pressable>
         </View>
+        </Animated.View>
       )}
           </View>
     );

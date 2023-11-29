@@ -1,36 +1,45 @@
-// CategoryContext.js
-import { useEffect } from 'react';
+// Storage.js
+import { useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const CategoryStorage = () => {
+export const useStorage = (key, initialState) => {
+  // Load state from AsyncStorage on mount
   useEffect(() => {
     const loadState = async () => {
       try {
-        const storedState = await AsyncStorage.getItem('categoryState');
+        const storedState = await AsyncStorage.getItem(key);
         if (storedState) {
           const parsedState = JSON.parse(storedState);
           console.log(parsedState);
+          // Update the state with the loaded data
+          setState(parsedState);
         }
       } catch (error) {
-        console.error('Error loading state from AsyncStorage:', error);
+        console.error(`Error loading state for key ${key} from AsyncStorage:`, error);
       }
     };
 
     loadState();
-  }, []);
+  }, [key]);
+
+  // State to hold the data
+  const [state, setState] = useState(initialState);
 
   // Save state to AsyncStorage whenever it changes
-  useEffect(() => {
-    const saveState = async () => {
-      try {
-        await AsyncStorage.setItem('categoryState', JSON.stringify(state));
-        const savedData = await AsyncStorage.getItem('categoryState');
-        console.log('Read data:', savedData);
-      } catch (error) {
-        console.error('Error saving state to AsyncStorage:', error);
-      }
-    };
+  const saveState = useCallback(async () => {
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(state));
+      const savedData = await AsyncStorage.getItem(key);
+      console.log(`Read data for key ${key}:`, savedData);
+    } catch (error) {
+      console.error(`Error saving state for key ${key} to AsyncStorage:`, error);
+    }
+  }, [key, state]);
 
+  // Update the saved state whenever the state changes
+  useEffect(() => {
     saveState();
-  }, [state]);
-}
+  }, [state, saveState]);
+
+  return [state, setState];
+};

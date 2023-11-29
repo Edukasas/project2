@@ -1,21 +1,34 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
-import { useEffect, useState} from 'react';
+import  React, {Image, Text, StyleSheet, View, TouchableOpacity, Pressable, TextInput, Animated, FlatList} from 'react-native';
+import { useEffect, useState, useRef} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useTemporaryContext } from '../../../TemporaryContext';
+import FastImage from 'react-native-fast-image';
 
 export default function AddAppsForm({ onSubmit, onCancel }){
     const { temporaryState, temporaryDispatch } = useTemporaryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
     const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const loadApps = async () => {
+          try {
             const appList = await InstalledApps.getApps();
             setApps(appList);
-
             setSelectedApps(temporaryState.selectedApps);
+            Animated.timing(fadeAnim, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: false,
+            }).start();
+          } catch (error) {
+            console.error('Error loading apps:', error);
+          } finally {
+            setLoading(false);
+          }
         };
         loadApps();
       }, []);
@@ -49,7 +62,8 @@ export default function AddAppsForm({ onSubmit, onCancel }){
           onCancel();
         };
     return (
-        <View  style={styles.appContainer}>
+          <Animated.View style={[styles.appContainer, { opacity: fadeAnim }]}>
+           {!loading && (
           <View style={styles.topPart}>
         <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image
@@ -71,28 +85,36 @@ export default function AddAppsForm({ onSubmit, onCancel }){
         source={require('../../../../assets/images/next.png')}
       /></Pressable>
       </View>
-        <ScrollView vertically={true}>
-    {apps.map((app, idx) => (
-     <TouchableOpacity
-     key={idx}
-     onPress={() => toggleAppSelection(idx)}
-     style={[
-        selectedApps.includes(idx) && styles.selectedAppItem,
-            idx === apps.length - 1 && styles.lastAppItem,
-      ]}>
-        <View style={styles.innerbg}>
-        <Image
-        source={{ uri: 'data:image/png;base64,' + app.icon }}
-        style={styles.img}
-        />
-        <Text style={styles.appLabel}>{app.label}</Text>
-        </View>
-   </TouchableOpacity>
-    ))}
-  </ScrollView>
-  </View>
+           )}
+      <FlatList
+        data={apps}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            onPress={() => toggleAppSelection(index)}
+            style={[
+              selectedApps.includes(index) && styles.selectedAppItem,
+              index === apps.length - 1 && styles.lastAppItem,
+            ]}
+          >
+            <View style={[styles.innerbg, index === apps.length - 1 && styles.lastInnerbg]}>
+              <FastImage
+                source={{ uri: 'data:image/png;base64,' + item.icon }}
+                style={styles.img}
+              />
+              <Text style={styles.appLabel}>{item.label}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+      </Animated.View>
     )}
 const styles = StyleSheet.create({
+    customActivityIndicator: {
+      backgroundColor: '#191C25',
+      justifyContent: 'center',
+      flex: 1,
+    },
     next: {
       alignSelf: 'center',
     },
@@ -111,10 +133,17 @@ const styles = StyleSheet.create({
       backgroundColor: '#191C25',
       borderRadius: 17,
       width: '100%',
-      height: '100%',
+      height: '95%',
       marginTop: 20,
       alignSelf: 'center',
     },
+    lastAppItem: {
+      borderBottomLeftRadius: 17,
+      borderBottomRightRadius: 17,
+  },
+  lastInnerbg: {
+    borderBottomWidth: 0,
+  },
     innerbg: {
       marginLeft: 20,
       marginRight: 20,
@@ -127,7 +156,7 @@ const styles = StyleSheet.create({
       gap: 10,
     },
     selectedAppItem: {
-        backgroundColor: 'blue',
+        backgroundColor: '#000061',
     },
     topPart: {
         borderTopLeftRadius: 17,
@@ -141,10 +170,6 @@ const styles = StyleSheet.create({
         borderColor: '#3A3D44',
         paddingTop: 10,
         paddingBottom: 10,
-    },
-    lastAppItem: {
-        borderBottomLeftRadius: 17,
-        borderBottomRightRadius: 17,
     },
     appLabel: {
         color: 'white',
