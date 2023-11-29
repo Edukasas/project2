@@ -13,7 +13,7 @@ export default function BlockedAppListScreen() {
   useEffect(() => {
     const checkStoredData = async () => {
       try {
-        const storedData = await AsyncStorage.getItem('categoryState');
+        const storedData = await AsyncStorage.getItem('categories');
         setIsStoredDataAvailable(!!storedData);
       } catch (error) {
         console.error('Error checking stored data:', error);

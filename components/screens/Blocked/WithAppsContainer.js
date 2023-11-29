@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { View, Text, StyleSheet, Image } from 'react-native';
+import React, { View, Text, StyleSheet, Image, ScrollView  } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
@@ -57,43 +57,66 @@ export default function WithAppContainer() {
       const firstSelectedApp = installedApps[firstSelectedAppIndex];
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
+      const borderStyles = [styles.border];
+      if (index === categories.length - 1) {
+        borderStyles.push(styles.lastBorder);
+      }
+
       return (
-        <View key={index} style={styles.block}>
+        <View key={index} style={styles.block} >
           <Image
             source={{ uri: `data:image/png;base64,${firstSelectedApp?.icon}` }}
             style={styles.img}
           />
+          <View style={borderStyles}>
           <Text style={styles.text}>{category?.customCategoryName}</Text>
           { moreThanOneApp ? 
         <View style={styles.numView}>
         <Text style={styles.number}>{appLength}</Text>
         </View> :
         <View></View>
-        }
+        }</View>
         </View>
       );
     });
   };
   return (
-    <View style={styles.Container}>
-      {renderCategoryBlocks()}
-    </View>
+    <ScrollView style={styles.scrollViewContainer}>
+    {renderCategoryBlocks()}
+  </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  border: {
+    borderBottomWidth: 1,
+    borderColor: '#3A3D44',
+    flex: 1,
+    flexDirection: 'row',
+  },
+  scrollViewContainer: {
+    maxHeight: 600,
+    borderRadius: 17,
+    marginTop: 10,
+    backgroundColor: '#191C25',
+  },
   Container: {
     backgroundColor: '#191C25',
     marginTop: 10,
+    borderRadius: 17,
+  },
+  lastBorder: {
+    borderBottomWidth: 0,
   },
   block: {
     flexDirection: 'row',
     gap: 18,
-    marginRight: 17,
+    marginRight: 22,
   },
   numView: {
     flex: 1,
-    alignItems: 'flex-end', 
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start', 
   },
   number: {
     fontSize: 11,
