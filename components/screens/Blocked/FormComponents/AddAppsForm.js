@@ -4,6 +4,7 @@ import { useEffect, useState, useRef} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import FastImage from 'react-native-fast-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AddAppsForm({ onSubmit, onCancel }){
     const { temporaryState, temporaryDispatch } = useTemporaryContext();
@@ -14,9 +15,18 @@ export default function AddAppsForm({ onSubmit, onCancel }){
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        const loadApps = async () => {
+     const loadApps = async () => {
           try {
-            const appList = await InstalledApps.getApps();
+            const storedCategories = await AsyncStorage.getItem('categories');
+            const parsedCategory = storedCategories ? JSON.parse(storedCategories) : [];
+            let appList = await InstalledApps.getApps();
+            
+            appList = appList.filter((value, idx) => {
+              let res = !parsedCategory.some(val => {
+                  return val.selectedApps.includes(value.packageName);
+              })
+              return res;
+            })
             setApps(appList);
             setSelectedApps(temporaryState.selectedApps);
             Animated.timing(fadeAnim, {
@@ -91,9 +101,9 @@ export default function AddAppsForm({ onSubmit, onCancel }){
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <TouchableOpacity
-            onPress={() => toggleAppSelection(index)}
+            onPress={() => toggleAppSelection(item.packageName)}
             style={[
-              selectedApps.includes(index) && styles.selectedAppItem,
+              selectedApps.includes(item.packageName) && styles.selectedAppItem,
               index === apps.length - 1 && styles.lastAppItem,
             ]}
           >

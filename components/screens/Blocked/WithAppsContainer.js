@@ -1,15 +1,31 @@
 /* eslint-disable prettier/prettier */
-import React, { View, Text, StyleSheet, Image, ScrollView  } from 'react-native';
+import React, { View, Text, StyleSheet, Image, ScrollView, NativeModules  } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
 export default function WithAppContainer() {
+  // const {UsageStatsModule} = NativeModules;
+  // [appUsages, setAppUsages] = useState([]);
+  // UsageStatsModule.getStats(1, stats => {
+  //   const appUsage = [];
+  //   let apps = stats.split(',');
+  //   apps.map(app => {
+  //     let appStats = app.split(':');
+  //     if (appStats[1] > 0) {
+  //       appUsage.push({
+  //         app: appStats[0],
+  //         time: appStats[1]
+  //       })
+  //     }
+  //   })
+  //   setAppUsages(appUsage)
+  // })
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
-
+  
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -53,8 +69,15 @@ export default function WithAppContainer() {
       return null;
     }
     return categories.map((category, index) => {
-      const firstSelectedAppIndex = category?.selectedApps[0];
-      const firstSelectedApp = installedApps[firstSelectedAppIndex];
+      const firstSelectedAppPackage = category?.selectedApps[0];
+      let time = 0;
+      category?.selectedApps.map(app => {
+        let found = appUsages.filter(a => a.app === app);
+        if (found && found.length > 0) {
+          time += parseInt(found[0].time);
+        }
+      })
+      const firstSelectedApp = installedApps.find(value => value.packageName === firstSelectedAppPackage);
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
       const borderStyles = [styles.border];
@@ -70,6 +93,7 @@ export default function WithAppContainer() {
           />
           <View style={borderStyles}>
           <Text style={styles.text}>{category?.customCategoryName}</Text>
+          {/* <Text>Time: {time} sec</Text> */}
           { moreThanOneApp ? 
         <View style={styles.numView}>
         <Text style={styles.number}>{appLength}</Text>

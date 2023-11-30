@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.edas.UsageStats;
+import com.edas.UsageStatsModule;
 
 public class MyAppPackage implements ReactPackage {
 
@@ -22,7 +22,7 @@ public class MyAppPackage implements ReactPackage {
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new UsageStats(reactContext));
+        modules.add(new UsageStatsModule(reactContext));
 
         return modules;
     }
