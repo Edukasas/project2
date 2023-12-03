@@ -5,6 +5,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
 export default function WithAppContainer() {
+<<<<<<< Updated upstream
+=======
+  //AsyncStorage.removeItem('categories');
+  const {UsageStatsModule} = NativeModules;
+  [appUsages, setAppUsages] = useState([]);
+  UsageStatsModule.getStats(1, stats => {
+    const appUsage = [];
+    let apps = stats.split(',');
+    apps.map(app => {
+      let appStats = app.split(':');
+      if (appStats[1] > 0) {
+        appUsage.push({
+          app: appStats[0],
+          time: appStats[1]
+        })
+      }
+    })
+    setAppUsages(appUsage)
+  }, error => {
+    console.log(error);
+  })
+>>>>>>> Stashed changes
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -70,6 +92,10 @@ export default function WithAppContainer() {
           />
           <View style={borderStyles}>
           <Text style={styles.text}>{category?.customCategoryName}</Text>
+<<<<<<< Updated upstream
+=======
+          <Text>Time: {time} sec</Text>
+>>>>>>> Stashed changes
           { moreThanOneApp ? 
         <View style={styles.numView}>
         <Text style={styles.number}>{appLength}</Text>
