@@ -1,15 +1,34 @@
 /* eslint-disable prettier/prettier */
-import React, { View, Text, StyleSheet, Image, ScrollView  } from 'react-native';
+import React, { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity   } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
-export default function WithAppContainer() {
+export default function WithAppContainer({setIsStoredDataAvailable}) {
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
+  const handleEditCategory = (category) => {
+    // Implement edit functionality here
+    console.log('Edit category:', category);
+  };
+  
+  const handleDeleteCategory = async (category) => {
+    try {
+      // Remove the category from the state
+      const updatedCategories = categories.filter((cat) => cat !== category);
+      setCategories(updatedCategories);
+  
+      // Save the updated categories to AsyncStorage
+      await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
 
+      setIsStoredDataAvailable(updatedCategories.length > 0);
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
+  };
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -53,6 +72,7 @@ export default function WithAppContainer() {
       return null;
     }
     return categories.map((category, index) => {
+      const isSelected = selectedCategory === category;
       const firstSelectedAppIndex = category?.selectedApps[0];
       const firstSelectedApp = installedApps[firstSelectedAppIndex];
       const appLength = category.selectedApps.length;
@@ -64,6 +84,10 @@ export default function WithAppContainer() {
 
       return (
         <View key={index} style={styles.block} >
+           <TouchableOpacity
+           style={styles.topBlock}
+          onPress={() => setSelectedCategory(isSelected ? null : category)}
+        >
           <Image
             source={{ uri: `data:image/png;base64,${firstSelectedApp?.icon}` }}
             style={styles.img}
@@ -76,6 +100,23 @@ export default function WithAppContainer() {
         </View> :
         <View></View>
         }</View>
+        </TouchableOpacity>
+         {isSelected && (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              onPress={() => handleEditCategory(category)}
+              style={styles.editButton}
+            >
+              <Text>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleDeleteCategory(category)}
+              style={styles.deleteButton}
+            >
+              <Text>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         </View>
       );
     });
@@ -108,9 +149,25 @@ const styles = StyleSheet.create({
   lastBorder: {
     borderBottomWidth: 0,
   },
-  block: {
+  buttonsContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  editButton: {
+    backgroundColor: 'green',
+    padding: 8,
+    marginHorizontal: 5,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    marginHorizontal: 5,
+  },
+  topBlock: {
     flexDirection: 'row',
     gap: 18,
+  },
+  block: {
     marginRight: 22,
   },
   numView: {
