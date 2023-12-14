@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
-export default function WithAppContainer({setIsStoredDataAvailable}) {
+export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
     // const {UsageStatsModule} = NativeModules;
   // [appUsages, setAppUsages] = useState([]);
   // UsageStatsModule.getStats(1, stats => {
@@ -26,9 +26,12 @@ export default function WithAppContainer({setIsStoredDataAvailable}) {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
-  const handleEditCategory = (category) => {
-    // Implement edit functionality here
-    console.log('Edit category:', category);
+  const handleEditCategory = () => {
+    if (typeof edit === 'function') {
+      edit();
+    } else {
+      console.error('Edit prop is not a function.');
+    }
   };
   
   const handleDeleteCategory = async (category) => {
@@ -130,15 +133,18 @@ export default function WithAppContainer({setIsStoredDataAvailable}) {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               onPress={() => handleEditCategory(category)}
-              style={styles.editButton}
+              style={styles.biggerBlock}
             >
-              <Text>Edit</Text>
+              <Image source={require('../../../assets/images/pen.png')}/>
+              <Text style={styles.Buttons}>Edit</Text>
             </TouchableOpacity>
+            <View style={styles.verticalLine} />
             <TouchableOpacity
               onPress={() => handleDeleteCategory(category)}
-              style={styles.deleteButton}
+              style={styles.biggerBlock}
             >
-              <Text>Delete</Text>
+              <Image source={require('../../../assets/images/trashbin.png')}/>
+              <Text style={styles.Buttons}>Delete</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -154,6 +160,12 @@ export default function WithAppContainer({setIsStoredDataAvailable}) {
 }
 
 const styles = StyleSheet.create({
+  verticalLine: {
+    height: '80%', // Adjust the height as needed
+    width: 1,
+    backgroundColor: '#3A3D44', // Change the color as needed
+    marginHorizontal: 10, // Adjust the margin as needed
+  },
   border: {
     borderBottomWidth: 1,
     borderColor: '#3A3D44',
@@ -178,15 +190,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
   },
-  editButton: {
-    backgroundColor: 'green',
-    padding: 8,
-    marginHorizontal: 5,
+  biggerBlock: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    marginBottom: 10,
+    gap: 10,
   },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 8,
-    marginHorizontal: 5,
+  Buttons: {
+    color:'#BBC4EC',
+    fontSize: 14,
   },
   topBlock: {
     flexDirection: 'row',

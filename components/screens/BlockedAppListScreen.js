@@ -52,7 +52,7 @@ export default function BlockedAppListScreen() {
         <Animated.View style={{ opacity: fadeAnim }}>
         <View>
           {isStoredDataAvailable ? (
-            <WithAppContainer setIsStoredDataAvailable={setIsStoredDataAvailable}/>
+            <WithAppContainer setIsStoredDataAvailable={setIsStoredDataAvailable} edit={handleCreateAppLimitPress}/>
           ) : (
           <EmptyAppContainer/>
           )}
