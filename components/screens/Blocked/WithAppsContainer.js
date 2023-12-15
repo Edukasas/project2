@@ -26,6 +26,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
+
   const handleEditCategory = () => {
     if (typeof edit === 'function') {
       edit();
@@ -104,10 +105,8 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       const isSelected = selectedCategory === category;
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
-      const borderStyles = [styles.border];
-      if (index === categories.length - 1) {
-        borderStyles.push(styles.lastBorder);
-      }
+      
+      const selectedBorderStyle = isSelected ? styles.selectedBorder : {};
 
       return (
         <View key={index} style={styles.block} >
@@ -119,7 +118,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
             source={{ uri: `data:image/png;base64,${firstSelectedApp?.icon}` }}
             style={styles.img}
           />
-          <View style={borderStyles}>
+          <View style={[styles.border, index === categories.length - 1 && styles.lastBorder, selectedBorderStyle]}>
           <Text style={styles.text}>{category?.customCategoryName}</Text>
           {/* <Text>Time: {time} sec</Text> */}
           { moreThanOneApp ? 
@@ -160,6 +159,9 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
 }
 
 const styles = StyleSheet.create({
+  selectedBorder: {
+    borderBottomWidth: 0,
+  },
   verticalLine: {
     height: '80%', // Adjust the height as needed
     width: 1,
