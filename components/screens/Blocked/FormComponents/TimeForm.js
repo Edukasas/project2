@@ -10,7 +10,8 @@ export default function TimeForm({ update, returnToApps }){
         const UsageMinutes = temporaryState.usageTimeMinutes;
         const UsageSeconds = temporaryState.usageTimeSeconds;
         const BlockedMinutes = temporaryState.blockedTimeMinutes;
-        const BlockedSeconds = temporaryState.blockedTimeMinutes;
+        const BlockedSeconds = temporaryState.blockedTimeSeconds;
+        const isEditing = temporaryState.editingCategory;
         const isValidInput = (text) => /^\d+$/.test(text) || text === '';
 
         useEffect(() => {
@@ -27,30 +28,45 @@ export default function TimeForm({ update, returnToApps }){
           };
           loadData();
         }, []);
-
         const handleSubmit = async() => {
           if ((UsageMinutes || UsageSeconds) && (BlockedMinutes || BlockedSeconds)){
             const parsedUsageMinutes = parseInt(UsageMinutes) || 0;
             const parsedUsageSeconds = parseInt(UsageSeconds) || 0;
             const parsedBlockedMinutes = parseInt(BlockedMinutes) || 0;
             const parsedBlockedSeconds = parseInt(BlockedSeconds) || 0;
-          
             const usageTime = parsedUsageMinutes * 60 + parsedUsageSeconds;
             const blockedTime = parsedBlockedMinutes * 60 + parsedBlockedSeconds;
 
-                try {
                   const newCategory = {
                     customCategoryName: temporaryState.customCategoryName,
                     selectedApps: temporaryState.selectedApps,
+                    parsedUsageMinutes,
+                    parsedUsageSeconds,
+                    parsedBlockedMinutes,
+                    parsedBlockedSeconds,
                     usageTime,
                     blockedTime,
                   };
-                  const updatedCategories = [...categories, newCategory];
-                  await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-                  setCategories(updatedCategories);
-                } catch (error) {
-                  console.error('Error saving state to AsyncStorage:', error);
-                }
+                  if (isEditing) {
+                    // Editing existing category
+                    const updatedCategories = categories.map((existingCategory) =>
+                      existingCategory.customCategoryName === temporaryState.customCategoryName
+                        ? newCategory
+                        : existingCategory
+                    );
+                
+                    await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
+                    setCategories(updatedCategories);
+                  } else {
+                    // Creating a new category
+                    try {
+                      const updatedCategories = [...categories, newCategory];
+                      await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
+                      setCategories(updatedCategories);
+                    } catch (error) {
+                      console.error('Error saving state to AsyncStorage:', error);
+                    }
+                  }
 
             update();
           }

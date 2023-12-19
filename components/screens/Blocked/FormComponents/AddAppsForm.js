@@ -18,12 +18,14 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
       if (categoryToEdit) {
         temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: categoryToEdit.customCategoryName });
         temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: categoryToEdit.selectedApps });
-        temporaryDispatch({ type: 'USAGE_TIME_MINUTES', payload: categoryToEdit.usageTimeMinutes.toString() });
-        temporaryDispatch({ type: 'USAGE_TIME_SECONDS', payload: categoryToEdit.usageTimeSeconds.toString() });
-        temporaryDispatch({ type: 'BLOCKED_TIME_MINUTES', payload: categoryToEdit.blockedTimeMinutes.toString() });
-        temporaryDispatch({ type: 'BLOCKED_TIME_SECONDS', payload: categoryToEdit.blockedTimeSeconds.toString() });
+        temporaryDispatch({ type: 'USAGE_TIME_MINUTES', payload: categoryToEdit.parsedUsageMinutes.toString() });
+        temporaryDispatch({ type: 'USAGE_TIME_SECONDS', payload: categoryToEdit.parsedUsageSeconds.toString() });
+        temporaryDispatch({ type: 'BLOCKED_TIME_MINUTES', payload: categoryToEdit.parsedBlockedMinutes.toString() });
+        temporaryDispatch({ type: 'BLOCKED_TIME_SECONDS', payload: categoryToEdit.parsedBlockedSeconds.toString() });
+        temporaryDispatch({ type: 'SET_EDITING_CATEGORY', payload: true });
       }
-    }, [categoryToEdit]);
+    }, [categoryToEdit, temporaryDispatch]);
+    
 
 
     useEffect(() => {
@@ -36,7 +38,7 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
             appList = appList.filter((value, idx) => {
               let res = !parsedCategory.some(val => {
                   return val.selectedApps.includes(value.packageName);
-              })
+              }) || (categoryToEdit && categoryToEdit.selectedApps && categoryToEdit.selectedApps.includes(value.packageName));
               return res;
             })
             setApps(appList);
@@ -53,7 +55,7 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
           }
         };
         loadApps();
-      }, []);
+      }, [temporaryState, setApps, setSelectedApps, fadeAnim, categoryToEdit]);
 
  
       const toggleAppSelection = (idx) => {

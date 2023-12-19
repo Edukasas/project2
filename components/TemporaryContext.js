@@ -7,6 +7,7 @@ const temporaryInitialState = {
     selectedApps: [],
     usageTime: 0,
     blockedTime: 0,
+    editingCategory: null,
 };
 
 const temporaryReducer = (state, action) => {
@@ -41,6 +42,9 @@ const temporaryReducer = (state, action) => {
             ...state,
             blockedTimeSeconds: action.payload,
           };
+          case 'SET_EDITING_CATEGORY':
+            return { ...state,
+               editingCategory: action.payload };
         case 'RESET_TEMPORARY_DATA':
             return temporaryInitialState;
     default:

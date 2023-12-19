@@ -5,7 +5,7 @@ import AddAppsForm from './FormComponents/AddAppsForm';
 import TimeForm from './FormComponents/TimeForm';
 import { TemporaryProvider } from '../../TemporaryContext';
 
-const AddCategory = ({ update, onCancel }) => {
+const AddCategory = ({ update, onCancel, categoryToEdit }) => {
 
   const [showTimeForm, setShowTimeForm] = useState(false);
   const handleAddAppsSubmit = () => {
@@ -18,7 +18,7 @@ const AddCategory = ({ update, onCancel }) => {
       <TemporaryProvider>
     <View>
       {showTimeForm ?
-       <TimeForm update={update} returnToApps={handleReturn} /> : <AddAppsForm onSubmit={handleAddAppsSubmit} onCancel={onCancel} /> }
+       <TimeForm update={update} returnToApps={handleReturn} /> : <AddAppsForm onSubmit={handleAddAppsSubmit} onCancel={onCancel} categoryToEdit={categoryToEdit} /> }
     </View>
     </TemporaryProvider>
   );

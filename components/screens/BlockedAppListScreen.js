@@ -10,12 +10,12 @@ export default function BlockedAppListScreen() {
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
   const [selectedEditCategory, setSelectedEditCategory] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
- 
   useEffect(() => {
     const checkStoredData = async () => {
       try {
         const storedData = await AsyncStorage.getItem('categories');
-        setIsStoredDataAvailable(!!storedData);
+        const parsedData = JSON.parse(storedData) || []; // Parse the data, default to an empty array
+       setIsStoredDataAvailable(parsedData.length > 0);
       } catch (error) {
         console.error('Error checking stored data:', error);
       }
@@ -23,7 +23,7 @@ export default function BlockedAppListScreen() {
 
     checkStoredData();
   }, []);
-
+console.log(isStoredDataAvailable);
     const handleCreateAppLimitPress = () => {
       setShowAddCategory(true);
       setSelectedEditCategory(null);
@@ -43,17 +43,18 @@ export default function BlockedAppListScreen() {
       return isStoredDataAvailable ? 'Add more' : 'Create App Limit';
     };
     useEffect(() => {
-      // Fade in when isStoredDataAvailable becomes true
+      if (isStoredDataAvailable) {
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500, // Adjust the duration as needed
         useNativeDriver: false, // Add this line if you are not using RN 0.63+
       }).start();
+    }
     }, [isStoredDataAvailable, fadeAnim]);
       return (
           <View style={styles.Container}>
   {showAddCategory ? (
-          <AddCategory update={handleUpdate} onCancel={handleCancel}/>
+          <AddCategory update={handleUpdate} onCancel={handleCancel} categoryToEdit={selectedEditCategory}/>
       ) : (
         <Animated.View style={{ opacity: fadeAnim }}>
         <View>
