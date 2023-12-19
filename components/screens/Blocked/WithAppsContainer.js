@@ -55,7 +55,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   startTime = startTime.getTime();
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
   const series = appUsages.map(val => val.time);
-  console.log(series)
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
