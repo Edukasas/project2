@@ -117,18 +117,19 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
     return usageStatsList;
   }
 
-  public static Map<String, UsageStats> getAggregateStatsMap(Context context, int durationInDays){
+  public static Map<String, UsageStats> getAggregateStatsMap(Context context, double startTime, double endTime){
     UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
     // Calendar calendar = Calendar.getInstance();
     // long endTime = calendar.getTimeInMillis();
     // calendar.add(Calendar.YEAR, -1);
     // long startTime = calendar.getTimeInMillis();
+    // Calendar cal = Calendar.getInstance();
 
-    List dates = getDates(durationInDays);
-    long startTime = (long)dates.get(0);
-    long endTime = (long)dates.get(1);
+    // long endTime = cal.getTimeInMillis();
+    // cal.add(Calendar.HOUR, -1);
+    // long startTime = cal.getTimeInMillis();
 
-    Map<String, UsageStats> aggregateStatsMap = usm.queryAndAggregateUsageStats(startTime, endTime);
+    Map<String, UsageStats> aggregateStatsMap = usm.queryAndAggregateUsageStats((long)startTime,(long)endTime);
     return aggregateStatsMap;
   }
 
@@ -182,11 +183,12 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getStats(
-    int durationInDays,
+    double startTime,
+    double endTime,
     Callback successCallback) {
-      if (durationInDays > 0) {
+      if (startTime < endTime) {
         try {
-          String stats = getStatsString(getAggregateStatsMap(getReactApplicationContext(), durationInDays));
+          String stats = getStatsString(getAggregateStatsMap(getReactApplicationContext(), startTime, endTime));
 
           // List dates = getDates(durationInDays);
 
@@ -196,7 +198,7 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
           Toast.makeText(getReactApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
         }
       } else {
-        String noticeMessage = "Enter an integer greater than 0!";
+        String noticeMessage = "Enter start time greather than endtime!";
         Toast.makeText(getReactApplicationContext(), noticeMessage, Toast.LENGTH_SHORT).show();
       }
     }

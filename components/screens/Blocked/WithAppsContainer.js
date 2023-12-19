@@ -4,10 +4,36 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
 
+function getUsageStats(startTime, endTime) {
+  const {UsageStatsModule} = NativeModules;
+  [appUsages, setAppUsages] = useState([]);
+  UsageStatsModule.getStats(startTime, endTime, stats => {
+    const appUsage = [];
+    let apps = stats.split(',');
+    apps.map(app => {
+      let appStats = app.split(':');
+      if (appStats[1] > 0) {
+        appUsage.push({
+          app: appStats[0],
+          time: Number(appStats[1])/1000
+        })
+      }
+    })
+    setAppUsages(appUsage)
+  })
+
+  return appUsages;
+}
+
 export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
-    // const {UsageStatsModule} = NativeModules;
-  // [appUsages, setAppUsages] = useState([]);
-  // UsageStatsModule.getStats(1, stats => {
+
+
+  // let endTime = (new Date()).getTime();
+  // let startTime = (new Date());
+  // startTime.setMinutes(0);
+  // startTime.setHours(0);
+  // startTime = startTime.getTime();
+  // UsageStatsModule.getStats(startTime, endTime, stats => {
   //   const appUsage = [];
   //   let apps = stats.split(',');
   //   apps.map(app => {
@@ -21,6 +47,15 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   //   })
   //   setAppUsages(appUsage)
   // })
+
+  let endTime = (new Date()).getTime();
+  let startTime = (new Date());
+  startTime.setMinutes(0);
+  startTime.setHours(0);
+  startTime = startTime.getTime();
+  [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
+  const series = appUsages.map(val => val.time);
+  console.log(series)
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -94,13 +129,13 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
     return categories.map((category, index) => {
 
       const firstSelectedAppPackage = category?.selectedApps[0];
-      // let time = 0;
-      // category?.selectedApps.map(app => {
-      //   let found = appUsages.filter(a => a.app === app);
-      //   if (found && found.length > 0) {
-      //     time += parseInt(found[0].time);
-      //   }
-      // })
+      let time = 0;
+      category?.selectedApps.map(app => {
+        let found = appUsages.filter(a => a.app === app);
+        if (found && found.length > 0) {
+          time += parseInt(found[0].time);
+        }
+      })
       const firstSelectedApp = installedApps.find(value => value.packageName === firstSelectedAppPackage);
       const isSelected = selectedCategory === category;
       const appLength = category.selectedApps.length;
@@ -120,7 +155,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
           />
           <View style={[styles.border, index === categories.length - 1 && styles.lastBorder, selectedBorderStyle]}>
           <Text style={styles.text}>{category?.customCategoryName}</Text>
-          {/* <Text>Time: {time} sec</Text> */}
+          <Text>Time: {time} sec</Text>
           { moreThanOneApp ? 
         <View style={styles.numView}>
         <Text style={styles.number}>{appLength}</Text>
