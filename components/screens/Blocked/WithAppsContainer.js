@@ -27,9 +27,9 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
 
-  const handleEditCategory = () => {
+  const handleEditCategory = (category) => {
     if (typeof edit === 'function') {
-      edit();
+      edit(category);
     } else {
       console.error('Edit prop is not a function.');
     }

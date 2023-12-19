@@ -8,6 +8,7 @@ import WithAppContainer from './Blocked/WithAppsContainer';
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
+  const [selectedEditCategory, setSelectedEditCategory] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
  
   useEffect(() => {
@@ -25,6 +26,11 @@ export default function BlockedAppListScreen() {
 
     const handleCreateAppLimitPress = () => {
       setShowAddCategory(true);
+      setSelectedEditCategory(null);
+    };
+    const handleEditCategoryPress = (category) => {
+      setShowAddCategory(true);
+      setSelectedEditCategory(category);
     };
     const handleCancel = () => {
       setShowAddCategory(false);
@@ -52,7 +58,7 @@ export default function BlockedAppListScreen() {
         <Animated.View style={{ opacity: fadeAnim }}>
         <View>
           {isStoredDataAvailable ? (
-            <WithAppContainer setIsStoredDataAvailable={setIsStoredDataAvailable} edit={handleCreateAppLimitPress}/>
+            <WithAppContainer setIsStoredDataAvailable={setIsStoredDataAvailable} edit={handleEditCategoryPress}/>
           ) : (
           <EmptyAppContainer/>
           )}

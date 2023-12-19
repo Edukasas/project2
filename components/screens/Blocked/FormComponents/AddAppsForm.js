@@ -6,13 +6,25 @@ import { useTemporaryContext } from '../../../TemporaryContext';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function AddAppsForm({ onSubmit, onCancel }){
+export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
     const { temporaryState, temporaryDispatch } = useTemporaryContext();
     const [apps, setApps] = useState([]);
     const [selectedApps, setSelectedApps] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
     const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      if (categoryToEdit) {
+        temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: categoryToEdit.customCategoryName });
+        temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: categoryToEdit.selectedApps });
+        temporaryDispatch({ type: 'USAGE_TIME_MINUTES', payload: categoryToEdit.usageTimeMinutes.toString() });
+        temporaryDispatch({ type: 'USAGE_TIME_SECONDS', payload: categoryToEdit.usageTimeSeconds.toString() });
+        temporaryDispatch({ type: 'BLOCKED_TIME_MINUTES', payload: categoryToEdit.blockedTimeMinutes.toString() });
+        temporaryDispatch({ type: 'BLOCKED_TIME_SECONDS', payload: categoryToEdit.blockedTimeSeconds.toString() });
+      }
+    }, [categoryToEdit]);
+
 
     useEffect(() => {
      const loadApps = async () => {
