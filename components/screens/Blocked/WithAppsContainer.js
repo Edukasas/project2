@@ -89,7 +89,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
         // Load category from AsyncStorage
         const storedCategories = await AsyncStorage.getItem('categories');
         const parsedCategory = storedCategories ? JSON.parse(storedCategories) : [];
-        console.log(storedCategories);
         setCategories(parsedCategory);
       } catch (categoryError) {
         setError(categoryError.message || 'Error fetching category');

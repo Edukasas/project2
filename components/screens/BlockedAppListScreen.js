@@ -23,7 +23,6 @@ export default function BlockedAppListScreen() {
 
     checkStoredData();
   }, []);
-console.log(isStoredDataAvailable);
     const handleCreateAppLimitPress = () => {
       setShowAddCategory(true);
       setSelectedEditCategory(null);

@@ -12,8 +12,8 @@ export default function TimeForm({ update, returnToApps }){
         const BlockedMinutes = temporaryState.blockedTimeMinutes;
         const BlockedSeconds = temporaryState.blockedTimeSeconds;
         const isEditing = temporaryState.editingCategory;
+        const customCategoryName = temporaryState.customCategoryName;
         const isValidInput = (text) => /^\d+$/.test(text) || text === '';
-
         useEffect(() => {
           const loadData = async () => {
             try {
@@ -36,9 +36,8 @@ export default function TimeForm({ update, returnToApps }){
             const parsedBlockedSeconds = parseInt(BlockedSeconds) || 0;
             const usageTime = parsedUsageMinutes * 60 + parsedUsageSeconds;
             const blockedTime = parsedBlockedMinutes * 60 + parsedBlockedSeconds;
-
                   const newCategory = {
-                    customCategoryName: temporaryState.customCategoryName,
+                    customCategoryName: customCategoryName,
                     selectedApps: temporaryState.selectedApps,
                     parsedUsageMinutes,
                     parsedUsageSeconds,
@@ -48,16 +47,18 @@ export default function TimeForm({ update, returnToApps }){
                     blockedTime,
                   };
                   if (isEditing) {
-                    // Editing existing category
+                    console.log(temporaryState.customCategoryName);
+                    console.log(categories);
+                   // Editing existing category
                     const updatedCategories = categories.map((existingCategory) =>
-                      existingCategory.customCategoryName === temporaryState.customCategoryName
-                        ? newCategory
+                      existingCategory.customCategoryName === temporaryState.editingCategoryKey
+                        ? { ...existingCategory, ...newCategory }
                         : existingCategory
                     );
-                
                     await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
                     setCategories(updatedCategories);
-                  } else {
+                  }
+                   else {
                     // Creating a new category
                     try {
                       const updatedCategories = [...categories, newCategory];
@@ -67,8 +68,7 @@ export default function TimeForm({ update, returnToApps }){
                       console.error('Error saving state to AsyncStorage:', error);
                     }
                   }
-
-            update();
+                    update();
           }
           else{
             alert('Input Value');

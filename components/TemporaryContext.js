@@ -8,6 +8,7 @@ const temporaryInitialState = {
     usageTime: 0,
     blockedTime: 0,
     editingCategory: null,
+    editingCategoryKey: null,
 };
 
 const temporaryReducer = (state, action) => {
@@ -45,6 +46,9 @@ const temporaryReducer = (state, action) => {
           case 'SET_EDITING_CATEGORY':
             return { ...state,
                editingCategory: action.payload };
+               case 'SET_EDITING_CATEGORY_KEY':
+                return { ...state,
+                   editingCategoryKey: action.payload };
         case 'RESET_TEMPORARY_DATA':
             return temporaryInitialState;
     default:

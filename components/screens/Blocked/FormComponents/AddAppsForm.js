@@ -16,7 +16,10 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
 
     useEffect(() => {
       if (categoryToEdit) {
+        const originalCategoryName = categoryToEdit.customCategoryName;
+
         temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: categoryToEdit.customCategoryName });
+        temporaryDispatch({ type: 'SET_EDITING_CATEGORY_KEY', payload: originalCategoryName });
         temporaryDispatch({ type: 'SET_SELECTED_APPS', payload: categoryToEdit.selectedApps });
         temporaryDispatch({ type: 'USAGE_TIME_MINUTES', payload: categoryToEdit.parsedUsageMinutes.toString() });
         temporaryDispatch({ type: 'USAGE_TIME_SECONDS', payload: categoryToEdit.parsedUsageSeconds.toString() });
@@ -25,9 +28,7 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
         temporaryDispatch({ type: 'SET_EDITING_CATEGORY', payload: true });
       }
     }, [categoryToEdit, temporaryDispatch]);
-    
-
-
+  
     useEffect(() => {
      const loadApps = async () => {
           try {
