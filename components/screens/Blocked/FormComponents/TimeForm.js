@@ -4,7 +4,7 @@ import { useState,useEffect} from 'react';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TimeForm({ update, returnToApps }){
+export default function TimeForm({ update, returnToApps, categoryToEdit }){
         const { temporaryState, temporaryDispatch } = useTemporaryContext();
         const [categories, setCategories] = useState([]);
         const UsageMinutes = temporaryState.usageTimeMinutes;
@@ -20,7 +20,6 @@ export default function TimeForm({ update, returnToApps }){
               // Load category from AsyncStorage
               const storedCategory = await AsyncStorage.getItem('categories');
               const parsedCategory = storedCategory ? JSON.parse(storedCategory) : [];
-              console.log(storedCategory);
               setCategories(parsedCategory);
             } catch (categoryError) {
               console.error('Error fetching category:', categoryError);
@@ -47,8 +46,6 @@ export default function TimeForm({ update, returnToApps }){
                     blockedTime,
                   };
                   if (isEditing) {
-                    console.log(temporaryState.customCategoryName);
-                    console.log(categories);
                    // Editing existing category
                     const updatedCategories = categories.map((existingCategory) =>
                       existingCategory.customCategoryName === temporaryState.editingCategoryKey
@@ -75,6 +72,7 @@ export default function TimeForm({ update, returnToApps }){
           }
         };
           const handleCancel = () => {
+            temporaryDispatch({ type: 'COMING_BACK_WHEN_EDITING', payload: false});
             returnToApps();
             };
             const handleUsageMinutes = (text) => {

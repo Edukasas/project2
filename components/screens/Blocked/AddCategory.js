@@ -18,7 +18,7 @@ const AddCategory = ({ update, onCancel, categoryToEdit }) => {
       <TemporaryProvider>
     <View>
       {showTimeForm ?
-       <TimeForm update={update} returnToApps={handleReturn} /> : <AddAppsForm onSubmit={handleAddAppsSubmit} onCancel={onCancel} categoryToEdit={categoryToEdit} /> }
+       <TimeForm update={update} returnToApps={handleReturn} categoryToEdit={categoryToEdit}/> : <AddAppsForm onSubmit={handleAddAppsSubmit} onCancel={onCancel} categoryToEdit={categoryToEdit} /> }
     </View>
     </TemporaryProvider>
   );

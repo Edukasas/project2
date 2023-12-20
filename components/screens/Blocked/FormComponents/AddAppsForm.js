@@ -13,9 +13,10 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
     const fadeAnim = useRef(new Animated.Value(0)).current;
-
+    const goingBack = temporaryState.goingBack;
+   
     useEffect(() => {
-      if (categoryToEdit) {
+      if (categoryToEdit && goingBack) {
         const originalCategoryName = categoryToEdit.customCategoryName;
 
         temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: categoryToEdit.customCategoryName });
@@ -27,7 +28,7 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
         temporaryDispatch({ type: 'BLOCKED_TIME_SECONDS', payload: categoryToEdit.parsedBlockedSeconds.toString() });
         temporaryDispatch({ type: 'SET_EDITING_CATEGORY', payload: true });
       }
-    }, [categoryToEdit, temporaryDispatch]);
+    }, [categoryToEdit, temporaryDispatch, goingBack]);
   
     useEffect(() => {
      const loadApps = async () => {
@@ -35,7 +36,6 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
             const storedCategories = await AsyncStorage.getItem('categories');
             const parsedCategory = storedCategories ? JSON.parse(storedCategories) : [];
             let appList = await InstalledApps.getApps();
-            
             appList = appList.filter((value, idx) => {
               let res = !parsedCategory.some(val => {
                   return val.selectedApps.includes(value.packageName);
