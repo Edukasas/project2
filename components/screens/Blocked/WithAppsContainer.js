@@ -3,6 +3,21 @@ import React, { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Nat
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InstalledApps } from 'react-native-launcher-kit';
+import Svg, { Rect } from 'react-native-svg';
+
+const DynamicBar = ({ segment1, segment2}) => {
+  const total = segment1 + segment2;
+const normalizedSegment1 = (segment1 / total) * 100;
+const normalizedSegment2 = (segment2 / total) * 100;
+  return (
+    <View style={styles.innerMidContainer}>
+      <Svg height="5" width="100%">
+        <Rect x="0%" y="0" width={`${normalizedSegment1}%`} height="5" fill="#95A4E5" />
+        <Rect x={`${normalizedSegment1}%`} y="0" width={`${normalizedSegment2}%`} height="5" fill="#686B72" />
+      </Svg>
+    </View>
+  );
+};
 
 function getUsageStats(startTime, endTime) {
   const {UsageStatsModule} = NativeModules;
@@ -60,7 +75,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
-
   const handleEditCategory = (category) => {
     if (typeof edit === 'function') {
       edit(category);
@@ -125,9 +139,9 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       return null;
     }
     return categories.map((category, index) => {
-
       const firstSelectedAppPackage = category?.selectedApps[0];
       let time = 0;
+      let usageTime = category.usageTime;
       category?.selectedApps.map(app => {
         let found = appUsages.filter(a => a.app === app);
         if (found && found.length > 0) {
@@ -138,9 +152,18 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       const isSelected = selectedCategory === category;
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
-      
       const selectedBorderStyle = isSelected ? styles.selectedBorder : {};
 
+      const calculateHoursAndMinutes = (screenTime) => {
+        const hours = Math.floor(screenTime / 3600);
+        const minutes = Math.floor((screenTime % 3600) / 60);
+        const formatPlural = (value, unit) => `${value} ${value === 1 ? unit : unit + 's'}`;
+        if (hours > 0) {
+          return `${formatPlural(hours, 'hour')} ${formatPlural(minutes, 'minute')}`;
+        } else {
+          return `${formatPlural(minutes, 'minute')}`;
+        }
+      };
       return (
         <View key={index} style={styles.block} >
            <TouchableOpacity
@@ -152,14 +175,20 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
             style={styles.img}
           />
           <View style={[styles.border, index === categories.length - 1 && styles.lastBorder, selectedBorderStyle]}>
-          <Text style={styles.text}>{category?.customCategoryName}</Text>
-          <Text>Time: {time} sec</Text>
-          { moreThanOneApp ? 
-        <View style={styles.numView}>
-        <Text style={styles.number}>{appLength}</Text>
-        </View> :
-        <View></View>
-        }</View>
+              <View style={styles.innerTopContainer}>
+              <Text style={styles.text}>{category?.customCategoryName}</Text>
+              { moreThanOneApp ?
+            <View style={styles.numView}>
+              <Text style={styles.number}>{appLength}</Text>
+            </View> :
+            <View/>
+            }
+            </View>
+ <DynamicBar segment1={time} segment2={usageTime-time} />
+            <View style={styles.innerBottomContainer}>
+              <Text style={styles.time}>{calculateHoursAndMinutes(time)} / {calculateHoursAndMinutes(usageTime)}</Text>
+            </View>
+        </View>
         </TouchableOpacity>
          {isSelected && (
           <View style={styles.buttonsContainer}>
@@ -190,8 +219,23 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
+  time: {
+    color: '#99999B',
+  },
+  innerBottomContainer: {
+    marginBottom: 15,
+  },
+  innerMidContainer: {
+    width: '100%',
+    height: 5,
+    backgroundColor: '#686B72',
+    borderRadius: 10,
+  },
+  innerTopContainer: {
+    flex: 1,
+    flexDirection: 'row',
+  },
   selectedBorder: {
     borderBottomWidth: 0,
   },
@@ -205,7 +249,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#3A3D44',
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'collumn',
+    justifyContent: 'space-between',
+    gap: 5,
   },
   scrollViewContainer: {
     maxHeight: 600,
