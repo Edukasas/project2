@@ -1,67 +1,13 @@
 /* eslint-disable prettier/prettier */
-import React, { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, NativeModules   } from 'react-native';
+import React, { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { InstalledApps } from 'react-native-launcher-kit';
-import Svg, { Rect } from 'react-native-svg';
-
-const DynamicBar = ({ segment1, segment2}) => {
-  const total = segment1 + segment2;
-const normalizedSegment1 = (segment1 / total) * 100;
-const normalizedSegment2 = (segment2 / total) * 100;
-  return (
-    <View style={styles.innerMidContainer}>
-      <Svg height="5" width="100%">
-        <Rect x="0%" y="0" width={`${normalizedSegment1}%`} height="5" fill="#95A4E5" />
-        <Rect x={`${normalizedSegment1}%`} y="0" width={`${normalizedSegment2}%`} height="5" fill="#686B72" />
-      </Svg>
-    </View>
-  );
-};
-
-function getUsageStats(startTime, endTime) {
-  const {UsageStatsModule} = NativeModules;
-  [appUsages, setAppUsages] = useState([]);
-  UsageStatsModule.getStats(startTime, endTime, stats => {
-    const appUsage = [];
-    let apps = stats.split(',');
-    apps.map(app => {
-      let appStats = app.split(':');
-      if (appStats[1] > 0) {
-        appUsage.push({
-          app: appStats[0],
-          time: Number(appStats[1])/1000
-        })
-      }
-    })
-    setAppUsages(appUsage)
-  })
-
-  return appUsages;
-}
-
+import { DynamicBar } from '../../helpers/DynamicBar';
+import { getUsageStats } from '../../helpers/UsageStats';
+import { fetchInstalledApps } from '../../helpers/FetchingApps';
+import { loadCategories } from '../../helpers/LoadDataFromStorage';
+import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
-
-
-  // let endTime = (new Date()).getTime();
-  // let startTime = (new Date());
-  // startTime.setMinutes(0);
-  // startTime.setHours(0);
-  // startTime = startTime.getTime();
-  // UsageStatsModule.getStats(startTime, endTime, stats => {
-  //   const appUsage = [];
-  //   let apps = stats.split(',');
-  //   apps.map(app => {
-  //     let appStats = app.split(':');
-  //     if (appStats[1] > 0) {
-  //       appUsage.push({
-  //         app: appStats[0],
-  //         time: appStats[1]
-  //       })
-  //     }
-  //   })
-  //   setAppUsages(appUsage)
-  // })
 
   let endTime = (new Date()).getTime();
   let startTime = (new Date());
@@ -99,33 +45,12 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   };
   useEffect(() => {
     const loadData = async () => {
-      try {
-        // Load category from AsyncStorage
-        const storedCategories = await AsyncStorage.getItem('categories');
-        const parsedCategory = storedCategories ? JSON.parse(storedCategories) : [];
-        setCategories(parsedCategory);
-      } catch (categoryError) {
-        setError(categoryError.message || 'Error fetching category');
-      } finally {
-        setLoading(false);
-      }
+      await loadCategories(setCategories, setLoading, setError);
     };
     loadData();
   }, []);
   useEffect(() => {
-    const fetchInstalledApps = async () => {
-      try {
-        const apps = InstalledApps.getApps();
-        setInstalledApps(apps);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching installed apps:', error);
-        setError(error.message || 'Error fetching apps');
-        setLoading(false);
-      }
-    };
-    // Fetch installed apps when the component mounts
-    fetchInstalledApps();
+    fetchInstalledApps(setInstalledApps, setLoading, setError);
   }, []);
   if (loading) {
     return <Text>Loading...</Text>;
@@ -153,17 +78,8 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
       const selectedBorderStyle = isSelected ? styles.selectedBorder : {};
-
-      const calculateHoursAndMinutes = (screenTime) => {
-        const hours = Math.floor(screenTime / 3600);
-        const minutes = Math.floor((screenTime % 3600) / 60);
-        const formatPlural = (value, unit) => `${value} ${value === 1 ? unit : unit + 's'}`;
-        if (hours > 0) {
-          return `${formatPlural(hours, 'hour')} ${formatPlural(minutes, 'minute')}`;
-        } else {
-          return `${formatPlural(minutes, 'minute')}`;
-        }
-      };
+      const usedTime = calculateHoursAndMinutes(time);
+      const leftTime = calculateHoursAndMinutes(usageTime);
       return (
         <View key={index} style={styles.block} >
            <TouchableOpacity
@@ -184,9 +100,9 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
             <View/>
             }
             </View>
- <DynamicBar segment1={time} segment2={usageTime-time} />
+ <DynamicBar segment1={time} segment2={usageTime-time} style={styles.innerMidContainer} height={5}/>
             <View style={styles.innerBottomContainer}>
-              <Text style={styles.time}>{calculateHoursAndMinutes(time)} / {calculateHoursAndMinutes(usageTime)}</Text>
+              <Text style={styles.time}>{usedTime} / {leftTime}</Text>
             </View>
         </View>
         </TouchableOpacity>

@@ -100,7 +100,7 @@ export default function AddAppsForm({ onSubmit, onCancel, categoryToEdit }){
           placeholder="Enter category name"
           placeholderTextColor={error ? 'red' : '#BBC4EC'}
           value={temporaryState.customCategoryName}
-          maxLength={20}
+          maxLength={15}
           onChangeText={(text) => {
             temporaryDispatch({ type: 'SET_CUSTOM_CATEGORY_NAME', payload: text });
         }}
