@@ -6,6 +6,8 @@ import { getUsageStats } from '../helpers/UsageStats';
 import { fetchInstalledApps } from '../helpers/FetchingApps';
 import { loadCategories } from '../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../helpers/TimeUtils';
+import { useFocusEffect } from '@react-navigation/native';
+
 import React  from 'react';
 export default function HomeScreen({navigation}) {
      navigation.setOptions({
@@ -23,16 +25,26 @@ export default function HomeScreen({navigation}) {
   startTime = startTime.getTime();
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
   const series = appUsages.map(val => val.time);
+  const [rerenderToggle, setRerenderToggle] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Screen is focused. Rerendering...'); // Add this line for debugging
+      setRerenderToggle((prev) => !prev);
+    }, [])
+  );
+
   useEffect(() => {
+    console.log(rerenderToggle);
     const loadData = async () => {
       await loadCategories(setCategories, setLoading, setError);
     };
     loadData();
-  }, []);
+  }, [rerenderToggle]);
   useEffect(() => {
     fetchInstalledApps(setInstalledApps, setLoading, setError);
   }, []);

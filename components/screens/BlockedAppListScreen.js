@@ -7,9 +7,10 @@ import EmptyAppContainer from './Blocked/EmptyAppsContainer';
 import WithAppContainer from './Blocked/WithAppsContainer';
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
-  const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
+  const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(true);
   const [selectedEditCategory, setSelectedEditCategory] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     const checkStoredData = async () => {
       try {
@@ -50,6 +51,7 @@ export default function BlockedAppListScreen() {
       }).start();
     }
     }, [isStoredDataAvailable, fadeAnim]);
+
       return (
           <View style={styles.Container}>
   {showAddCategory ? (

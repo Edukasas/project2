@@ -1,5 +1,4 @@
 import {StyleSheet, Text, View} from 'react-native';
-
 export default function StatisticsScreen({navigation}) {
     return (
             <View style={styles.Container}>
