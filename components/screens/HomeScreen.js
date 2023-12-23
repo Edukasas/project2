@@ -7,8 +7,8 @@ import { fetchInstalledApps } from '../helpers/FetchingApps';
 import { loadCategories } from '../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../helpers/TimeUtils';
 import { useFocusEffect } from '@react-navigation/native';
-
 import React  from 'react';
+
 export default function HomeScreen({navigation}) {
      navigation.setOptions({
     headerTitle: () => (
@@ -24,12 +24,14 @@ export default function HomeScreen({navigation}) {
   startTime.setHours(0);
   startTime = startTime.getTime();
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
+  let [allTime, setAllTime] = useState(0);
   const series = appUsages.map(val => val.time);
   const [rerenderToggle, setRerenderToggle] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
+  const [allTimeCalculated, setAllTimeCalculated] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -48,11 +50,29 @@ export default function HomeScreen({navigation}) {
   useEffect(() => {
     fetchInstalledApps(setInstalledApps, setLoading, setError);
   }, []);
+  useEffect(() => {
+    let updatedTime = 0;
+    if (categories !== null) {
+      categories.forEach((category) => {
+        let time = 0;
+        category?.selectedApps.forEach((app) => {
+          const found = appUsages.find((a) => a.app === app);
+          if (found) {
+            time += parseInt(found.time);
+          }
+        });
+        updatedTime += time;
+      });
+    }
+      setAllTimeCalculated(true);
+      setAllTime(updatedTime);
+  }, [allTimeCalculated, categories, appUsages]);
+
   const renderCategoryBlocks = () => {
     if (categories === null) {
       return null;
     }
-    return categories.map((category, index) => {
+    const renderBlocks = categories.map((category, index) => {
       const firstSelectedAppPackage = category?.selectedApps[0];
       let time = 0;
       let usageTime = category.usageTime;
@@ -61,7 +81,7 @@ export default function HomeScreen({navigation}) {
         if (found && found.length > 0) {
           time += parseInt(found[0].time);
         }
-      })
+      });
       const firstSelectedApp = installedApps.find(value => value.packageName === firstSelectedAppPackage);
       const appLength = category.selectedApps.length;
       const moreThanOneApp = appLength > 1;
@@ -83,24 +103,26 @@ export default function HomeScreen({navigation}) {
           </View>
             }
             <View styles={styles.BarAndTime}>
-                <DynamicBar segment1={time} segment2={usageTime-time} style={styles.innerMidContainer} height={9}/>
-                 <View style={styles.innerBottomContainer}>
+                <DynamicBar segment1={time} segment2={usageTime-time} style={styles.DynamicBar} height={9}/>
                 <Text style={styles.time}>{usedTime} / {leftTime}</Text>
-                </View> 
                </View>
         </View>
       );
   });
+  return renderBlocks;
 };
+
     return (
-        
             <View style={styles.Container}>
                 <View style={styles.topBlock}>
-
+                  <View style={styles.topPart}>
+                    <Text style={styles.topBlockName}>Screen Time</Text>
+                    <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
+                  </View>
+                {renderCategoryBlocks()}
                 </View>
                 <View style={styles.bottomBlock}>
-                  <Text style={styles.bottomBlockName}>App timers</Text>
-                {renderCategoryBlocks()}
+
                 </View>
             </View>
     );
@@ -110,7 +132,7 @@ const styles = StyleSheet.create({
     Header: {
         backgroundColor: '#354171',
     },
-    innerMidContainer: {
+    DynamicBar: {
       width: 160,
       alignSelf: 'flex-end',
     },
@@ -129,21 +151,28 @@ const styles = StyleSheet.create({
   topBlock: {
     borderRadius: 17,
     backgroundColor: '#191C25',
-    height: 370,
   },
-    bottomBlock: {
-      borderRadius: 17,
-      backgroundColor: '#191C25',
-    },
-    bottomBlockName: {
+  topPart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    lineHeight: 21,
+    marginTop: 18,
+    marginLeft: 25,
+    marginRight: 25,
+  },
+  allTime: {
+    color: 'white',
+  },
+    topBlockName: {
       fontFamily: 'Roboto-Regular',
       fontWeight: '700',
       fontSize: 18,
-      lineHeight: 21,
-      color: 'white',
-      marginTop: 18,
-      marginLeft: 25,
       marginBottom: 11,
+      color: 'white',
+    },
+    bottomBlock: {
+      borderRadius: 17,
+      backgroundColor: '#191C25',
     },
     block: {
       flexDirection: 'row',
