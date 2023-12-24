@@ -1,14 +1,17 @@
 /* eslint-disable prettier/prettier */
-import {StyleSheet, Image, Text, View} from 'react-native';
+import {StyleSheet, Image, Text, View, ScrollView} from 'react-native';
 import { useEffect, useState } from 'react';
 import { DynamicBar } from '../helpers/DynamicBar';
 import { getUsageStats } from '../helpers/UsageStats';
 import { fetchInstalledApps } from '../helpers/FetchingApps';
 import { loadCategories } from '../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../helpers/TimeUtils';
-import { useFocusEffect } from '@react-navigation/native';
+import { checkStorageContents } from '../helpers/StorageCheck';
+import { generateCategoryColors } from '../helpers/RandomColor';
+import { useMemo } from 'react';
+import PieChart from 'react-native-pie-chart';
 import React  from 'react';
-
+//import { ScrollView } from 'react-native-gesture-handler';
 export default function HomeScreen({navigation}) {
      navigation.setOptions({
     headerTitle: () => (
@@ -25,32 +28,27 @@ export default function HomeScreen({navigation}) {
   startTime = startTime.getTime();
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
   let [allTime, setAllTime] = useState(0);
-  const series = appUsages.map(val => val.time);
-  const [rerenderToggle, setRerenderToggle] = useState(false);
+  const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
   const [allTimeCalculated, setAllTimeCalculated] = useState(false);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('Screen is focused. Rerendering...'); // Add this line for debugging
-      setRerenderToggle((prev) => !prev);
-    }, [])
-  );
+  const widthAndHeight = 160;
+  const categoryColors = useMemo(() => generateCategoryColors(categories.length), [categories]);
 
   useEffect(() => {
-    console.log(rerenderToggle);
     const loadData = async () => {
       await loadCategories(setCategories, setLoading, setError);
     };
     loadData();
-  }, [rerenderToggle]);
+  }, []);
   useEffect(() => {
     fetchInstalledApps(setInstalledApps, setLoading, setError);
   }, []);
+
   useEffect(() => {
+    const newSeries = [];
     let updatedTime = 0;
     if (categories !== null) {
       categories.forEach((category) => {
@@ -61,9 +59,11 @@ export default function HomeScreen({navigation}) {
             time += parseInt(found.time);
           }
         });
+        newSeries.push(time);
         updatedTime += time;
       });
     }
+      setSeries(newSeries);
       setAllTimeCalculated(true);
       setAllTime(updatedTime);
   }, [allTimeCalculated, categories, appUsages]);
@@ -72,6 +72,7 @@ export default function HomeScreen({navigation}) {
     if (categories === null) {
       return null;
     }
+    
     const renderBlocks = categories.map((category, index) => {
       const firstSelectedAppPackage = category?.selectedApps[0];
       let time = 0;
@@ -102,8 +103,8 @@ export default function HomeScreen({navigation}) {
             <Text style={styles.number2}>{appLength}</Text>
           </View>
             }
-            <View styles={styles.BarAndTime}>
-                <DynamicBar segment1={time} segment2={usageTime-time} style={styles.DynamicBar} height={9}/>
+            <View style={styles.BarAndTime}>
+                <DynamicBar segment1={time} segment2={usageTime-time} color={categoryColors[index]} style={styles.DynamicBar} height={9}/>
                 <Text style={styles.time}>{usedTime} / {leftTime}</Text>
                </View>
         </View>
@@ -112,28 +113,98 @@ export default function HomeScreen({navigation}) {
   return renderBlocks;
 };
 
-    return (
-            <View style={styles.Container}>
-                <View style={styles.topBlock}>
-                  <View style={styles.topPart}>
-                    <Text style={styles.topBlockName}>Screen Time</Text>
-                    <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
-                  </View>
-                {renderCategoryBlocks()}
-                </View>
-                <View style={styles.bottomBlock}>
+const renderAllApps = () => {
+  if (categories === null) {
+    return null;
+  }
+  
+  const renderApps = [];
+  
+  categories.forEach((category, categoryIndex) => {
+    category.selectedApps.forEach((app, appIndex) => {
+      let time = 0;
+      let usageTime = category.usageTime;
+      const found = appUsages.find((a) => a.app === app);
 
-                </View>
-            </View>
-    );
+      if (found) {
+        time = parseInt(found.time);
+      }
+
+      const appDetails = installedApps.find((value) => value.packageName === app);
+      const usedTime = calculateHoursAndMinutes(time);
+      const leftTime = calculateHoursAndMinutes(usageTime);
+
+      renderApps.push(
+        <View key={`${categoryIndex}-${appIndex}`} style={styles.block}>
+          <Image
+            source={{ uri: `data:image/png;base64,${appDetails?.icon}` }}
+            style={styles.img}
+          />
+          <Text style={styles.text}>{appDetails?.label}</Text>
+          <View style={styles.numView2}>
+            <Text style={styles.number2}/>
+          </View>
+          <View style={styles.BarAndTime}>
+            <DynamicBar
+              segment1={time}
+              segment2={usageTime - time}
+              color={'#95A4E5'}
+              style={styles.DynamicBar}
+              height={9}
+            />
+            <Text style={styles.time}>{usedTime} / {leftTime}</Text>
+          </View>
+        </View>
+      );
+    });
+  });
+
+  return renderApps;
+};
+
+return (
+  <ScrollView vertically={true}>
+  <View style={styles.Container}>
+    <View style={styles.Blocks}>
+      <View style={styles.topPart}>
+        <Text style={styles.BlockName}>Screen Time</Text>
+        <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
+      </View>
+      {categoryColors.length === series.length && series.length > 0 ? (
+        <PieChart
+          style={styles.PieChart}
+          widthAndHeight={widthAndHeight}
+          series={series}
+          sliceColor={categoryColors}
+          coverRadius={0.80}
+          coverFill={'#191C25'}
+        />
+      ) : (
+        <Text>Loading...</Text>
+      )}
+      {renderCategoryBlocks()}
+    </View>
+    <View style={styles.Blocks}>
+      <View style={styles.topPart}>
+        <Text style={styles.BlockName}>App timers</Text>
+      </View>
+      {renderAllApps()}
+    </View>
+  </View>
+  </ScrollView>
+); 
 }
 
+
 const styles = StyleSheet.create({
+   PieChart: {
+      alignSelf: 'center',
+   },
     Header: {
         backgroundColor: '#354171',
     },
     DynamicBar: {
-      width: 160,
+      width: 150,
       alignSelf: 'flex-end',
     },
     logo: {
@@ -147,8 +218,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     flex: 1,
     gap: 20,
-},
-  topBlock: {
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+Blocks: {
     borderRadius: 17,
     backgroundColor: '#191C25',
   },
@@ -163,16 +236,12 @@ const styles = StyleSheet.create({
   allTime: {
     color: 'white',
   },
-    topBlockName: {
+    BlockName: {
       fontFamily: 'Roboto-Regular',
       fontWeight: '700',
       fontSize: 18,
       marginBottom: 11,
       color: 'white',
-    },
-    bottomBlock: {
-      borderRadius: 17,
-      backgroundColor: '#191C25',
     },
     block: {
       flexDirection: 'row',
@@ -190,7 +259,7 @@ const styles = StyleSheet.create({
     text: {
       fontWeight: '500',
       fontFamily: 'Roboto',
-      fontSize: 14,
+      fontSize: 13,
       color: 'white',
     },
     numView: {

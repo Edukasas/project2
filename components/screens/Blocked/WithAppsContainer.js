@@ -28,7 +28,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       console.error('Edit prop is not a function.');
     }
   };
-  
   const handleDeleteCategory = async (category) => {
     try {
       // Remove the category from the state
