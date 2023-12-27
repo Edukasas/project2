@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
       gap: 10,
     },
     selectedAppItem: {
-        backgroundColor: '#000061',
+        backgroundColor: '#596080',
     },
     topPart: {
         borderTopLeftRadius: 17,

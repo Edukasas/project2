@@ -15,7 +15,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   startTime.setHours(0);
   startTime = startTime.getTime();
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
-  const series = appUsages.map(val => val.time);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -99,7 +98,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
             <View/>
             }
             </View>
- <DynamicBar segment1={time} segment2={usageTime-time} style={styles.innerMidContainer} height={5}/>
+ <DynamicBar segment1={time} segment2={usageTime - time} color={'#95A4E5'} style={styles.innerMidContainer} height={5}/>
             <View style={styles.innerBottomContainer}>
               <Text style={styles.time}>{usedTime} / {leftTime}</Text>
             </View>
