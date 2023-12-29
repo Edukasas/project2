@@ -1,9 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
-
+import DayStatistics from './StatisticsScreenFiles/DayStatistics';
+import WeekStatistics from './StatisticsScreenFiles/WeekStatistics';
+import React from 'react';
 export default function StatisticsScreen({ navigation }) {
-  const [activeButton, setActiveButton] = useState(null);
+  const [activeButton, setActiveButton] = useState('day');
 
   const handlePress = (buttonName) => {
     setActiveButton(buttonName);
@@ -11,7 +13,7 @@ export default function StatisticsScreen({ navigation }) {
 
   const isDayButtonActive = activeButton === 'day';
   const isWeekButtonActive = activeButton === 'week';
-
+console.log(isDayButtonActive);
   return (
     <View style={styles.Container}>
       <View style={styles.topPart}>
@@ -52,6 +54,9 @@ export default function StatisticsScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
       </View>
+            {isDayButtonActive ? <DayStatistics/> :
+            <WeekStatistics/>
+            }
     </View>
   );
 }
