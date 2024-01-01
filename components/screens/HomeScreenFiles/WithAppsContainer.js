@@ -61,6 +61,7 @@ export default function WithAppsContainer() {
           const found = appUsages.find((a) => a.app === app);
           if (found) {
             time += parseInt(found.time);
+            console.log(category.selectedApps," ", time);
           }
         });
         newSeries.push(time);
@@ -68,7 +69,6 @@ export default function WithAppsContainer() {
       });
     }
       setSeries(newSeries);
-      
       setAllTimeCalculated(true);
       setAllTime(updatedTime);
   }, [rerenderToggle, allTimeCalculated, categories]);

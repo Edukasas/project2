@@ -1,4 +1,4 @@
-export const generateCategoryColors = (categoriesLength) => {
+export const generateCategoryColors = (length) => {
   const predefinedColors = [
     '#354171',
     '#5D4C7E',
@@ -21,17 +21,17 @@ export const generateCategoryColors = (categoriesLength) => {
     '#DDE1FF',
     '#2E2441',
   ];
+
   const newCategoryColors = [];
-  for (let i = 0; i < categoriesLength; i++) {
-    if (i < predefinedColors.length) {
-      // Use predefined colors if available
-      newCategoryColors.push(predefinedColors[i]);
-    } else {
-      // Generate random color
-      const randomColor = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-      const color = `#${randomColor}`;
-      newCategoryColors.push(color);
-    }
+
+  for (let i = 0; i < length; i++) {
+    const color = i < predefinedColors.length ? predefinedColors[i] : generateRandomColor();
+    newCategoryColors.push(color);
   }
+
   return newCategoryColors;
+};
+
+const generateRandomColor = () => {
+  return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
 };

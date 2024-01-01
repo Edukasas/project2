@@ -35,7 +35,7 @@ export default function HomeScreen({navigation}) {
     };
 
     checkStoredData();
-  }, [rerenderToggle]);
+  }, [rerenderToggle, isStoredDataAvailable]);
 return (
   <ScrollView vertically={true} style={styles.OuterContainer}>
   {isStoredDataAvailable ? 
