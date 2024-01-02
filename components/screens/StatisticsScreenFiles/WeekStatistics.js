@@ -1,15 +1,14 @@
 /* eslint-disable prettier/prettier */
-import { StyleSheet, View, Text, Image, Pressable, ScrollView, Dimensions } from "react-native";
+import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native";
 import {useState, useEffect} from 'react';
-import { DynamicBar } from '../../helpers/DynamicBar';
+import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
 import { getUsageStats } from '../../helpers/UsageStats';
 import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 import { generateCategoryColors } from '../../helpers/ColorUtils';
+import { GenerateBarChart } from '../../helpers/BarChart';
 import { useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { BarChart } from "react-native-gifted-charts";
 import React from "react";
 export default function WeekStatistics(){
     let [currentDate, setCurrentDate] = useState(new Date());
@@ -41,28 +40,8 @@ export default function WeekStatistics(){
         newDate.setDate(currentDate.getDate() + 7);
         setCurrentDate(newDate);
     };
-    const barData = [
-        {value: 250, label: 'S'},
-        {value: 500, label: 'M'},
-        {value: 745, label: 'T'},
-        {value: 320, label: 'W'},
-        {value: 600, label: 'T'},
-        {value: 256, label: 'F'},
-        {value: 300, label: 'S'},
-    ];
-    const yAxisLabelFormatter = (value) => {
-        // Check if the value starts with '0'
-        if (value.startsWith('0')) {
-          // Remove the first character ('0')
-          return value.substring(1);
-        }
-        // Return the original value if it doesn't start with '0'
-        return value;
-      };
-    const textStyle = {
-        color: '#FFF',
-        fontSize: 12,
-    };
+
+
     let endTime = (new Date()).getTime();
     let startTime = (new Date());
     startTime.setMinutes(0);
@@ -74,7 +53,6 @@ export default function WeekStatistics(){
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [categories, setCategories] = useState([]);
     const [installedApps, setInstalledApps] = useState([]);
     const [allTimeCalculated, setAllTimeCalculated] = useState(false);
     const appColor = useMemo(() => generateCategoryColors(series.length), [series]);
@@ -84,8 +62,6 @@ export default function WeekStatistics(){
       setShowAllApps(!showAllApps);
       setBtnText(!btnText);
     };
-   const screenWidth = Dimensions.get("window").width;
-
 
     useFocusEffect(
       React.useCallback(() => {
@@ -93,98 +69,74 @@ export default function WeekStatistics(){
         setRerenderToggle((prev) => !prev);
       }, [])
     );
-    useEffect(() => {
-      const loadData = async () => {
-        try {
-          await loadCategories(setCategories, setLoading, setError);
-        } catch (error) {
-          console.error('Error loading categories:', error);
-        }
-      };
-    
-      loadData();
-    }, [rerenderToggle]);
     
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
-  
     useEffect(() => {
       const newSeries = [];
       let updatedTime = 0;
-      if (categories !== null) {
-        categories.forEach((category) => {
-          let time = 0;
-          category?.selectedApps.forEach((app) => {
-            const found = appUsages.find((a) => a.app === app);
-            if (found) {
-              newSeries.push(found.time);
-              time += parseInt(found.time);
-            }
-          });
-          updatedTime += time;
-        });
-      }
-        setSeries(newSeries);
-        setAllTimeCalculated(true);
-        setAllTime(updatedTime);
-    }, [rerenderToggle, allTimeCalculated, categories]);
-   
-    const renderAllApps = () => {
-      if (categories === null) {
-        return null;
-      }
-      
-      const renderApps = [];
-    
-      categories.forEach((category, categoryIndex) => {
-        category.selectedApps.forEach((app, appIndex) => {
-          let time = 0;
-          let usageTime = category.usageTime;
-          const found = appUsages.find((a) => a.app === app);
-          if (found) {
-            time = parseInt(found.time);
-          }
-    
-          const appDetails = installedApps.find((value) => value.packageName === app);
-          const usedTime = calculateHoursAndMinutes(time);
-          const leftTime = calculateHoursAndMinutes(usageTime);
-          const colorIndex = appIndex % appColor.length;
-          renderApps.push({
-            appIndex: `${categoryIndex}-${appIndex}`,
-            appBlock: (
-              <View key={`${categoryIndex}-${appIndex}`} style={styles.block}>
-                <Image
-                  source={{ uri: `data:image/png;base64,${appDetails?.icon}` }}
-                  style={styles.img}
-                />
-                <Text style={styles.text}>{appDetails?.label}</Text>
-                <View style={styles.numView2}>
-                  <Text style={styles.number2} />
-                </View>
-                <View style={styles.BarAndTime}>
-                  <DynamicBar
-                    segment1={time}
-                    segment2={usageTime - time}
-                    color={appColor[colorIndex]}
-                    style={styles.DynamicBar}
-                    height={9}
-                  />
-                  <Text style={styles.time}>{usedTime} / {leftTime}</Text>
-                </View>
-              </View>
-            ),
-            time: time,
-          });
-        });
+      installedApps.forEach((app) => {
+        let time = 0;
+        const found = appUsages.find((a) => a.app === app.packageName);
+        if (found) {
+          newSeries.push(found.time);
+          time += parseInt(found.time);
+        }
+        updatedTime += time;
       });
+      const orderedSeries = [...newSeries].sort((a, b) => b - a);
+
+      setSeries(orderedSeries);
+      setAllTimeCalculated(true);
+      setAllTime(updatedTime);
+    }, [rerenderToggle, allTimeCalculated, installedApps]);
+
+    const renderAllApps = () => {
+      const renderApps = [];
+      const sortedApps = [...installedApps].sort((a, b) => {
+        // Assuming that appUsages contains the screen time information for each app
+        const timeA = appUsages.find((usage) => usage.app === a.packageName)?.time || 0;
+        const timeB = appUsages.find((usage) => usage.app === b.packageName)?.time || 0;
+      
+        // Sort by screen time in descending order
+        return timeB - timeA;
+      });
+      sortedApps.forEach((app, index) => {
+        let time = 0;
+        const found = appUsages.find((a) => a.app === app.packageName);
     
+        if (found) {
+          time = parseInt(found.time);
+        }
+        if (time > 0){
+        const usedTime = calculateHoursAndMinutes(time);
+        renderApps.push({
+          appBlock: (
+            <View key={`${index}`} style={styles.block}>
+              <Image
+                source={{ uri: `data:image/png;base64,${app.icon}` }}
+                style={styles.img}
+              />
+              <Text style={styles.text}>{app.label}</Text>
+              <View style={styles.numView2}>
+                <Text style={styles.number2} />
+              </View>
+              <View style={styles.BarAndTime}>
+              <DynamicWidthBar value={time} maxValue={14400} color={'#354171'} />
+                <Text style={styles.time}>{usedTime}</Text>
+              </View>
+            </View>
+          ),
+          time: time,
+        });
+      }
+      });
       // Sort renderApps array based on screen time in descending order
       renderApps.sort((a, b) => b.time - a.time);
-    
+
       return renderApps.map((app) => app.appBlock);
     };
-
     const renderVisibleApps = showAllApps ? renderAllApps() : renderAllApps().slice(0, 3);
     const renderText = btnText ? 'View less' : 'View more';
     return (
@@ -205,43 +157,9 @@ export default function WeekStatistics(){
             <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
           </View>
           {appColor.length === series.length && series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
-         <BarChart
-         width={screenWidth}
-         noOfSections={2}
-         barBorderTopRightRadius={4}
-         barBorderTopLeftRadius={4}
-         frontColor="#354171"
-         data={barData}
-         yAxisThickness={0}
-         xAxisThickness={1}
-         xAxisColor={'#3A3D44'}
-         yAxisLabelWidth={35}
-         yAxisTextStyle={textStyle}
-         xAxisLabelTextStyle={textStyle}
-         yAxisSide={'Right'}
-         rulesColor={'#3A3D44'}
-         xAxisType={'solid'}
-     />
+<GenerateBarChart/>
       ) : (
-        <>
-        <BarChart
-        width={screenWidth}
-        noOfSections={2}
-        barBorderTopRightRadius={4}
-        barBorderTopLeftRadius={4}
-        frontColor="#354171"
-        data={barData}
-        yAxisThickness={0}
-        xAxisThickness={1}
-        xAxisColor={'#3A3D44'}
-        yAxisLabelWidth={35}
-        yAxisTextStyle={textStyle}
-        xAxisLabelTextStyle={textStyle}
-        yAxisSide={'Right'}
-        rulesColor={'#3A3D44'}
-        xAxisType={'solid'}
-    />
-  </>
+<></>
       )}
           {renderVisibleApps}
           <Pressable title={showAllApps ? 'Show Top 3 Apps' : 'Show All Apps'} onPress={toggleAppsVisibility} style={styles.button}>

@@ -1,16 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native";
-import {useState, useEffect} from 'react';
+import { StyleSheet, View, Text, Image, Pressable, ScrollView } from 'react-native';
+import React, {useState, useEffect} from 'react';
 import { DynamicBar } from '../../helpers/DynamicBar';
+import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
 import { getUsageStats } from '../../helpers/UsageStats';
 import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 import { generateCategoryColors } from '../../helpers/ColorUtils';
 import { useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
-import React from "react";
 export default function DayStatistics(){
     let [currentDate, setCurrentDate] = useState(new Date());
     let [formattedDate, setFormattedDate] = useState(null);
@@ -40,7 +39,6 @@ export default function DayStatistics(){
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [categories, setCategories] = useState([]);
     const [installedApps, setInstalledApps] = useState([]);
     const [allTimeCalculated, setAllTimeCalculated] = useState(false);
     const widthAndHeight = 160;
@@ -51,8 +49,6 @@ export default function DayStatistics(){
       setShowAllApps(!showAllApps);
       setBtnText(!btnText);
     };
-  
-
 
     useFocusEffect(
       React.useCallback(() => {
@@ -60,98 +56,76 @@ export default function DayStatistics(){
         setRerenderToggle((prev) => !prev);
       }, [])
     );
-    useEffect(() => {
-      const loadData = async () => {
-        try {
-          await loadCategories(setCategories, setLoading, setError);
-        } catch (error) {
-          console.error('Error loading categories:', error);
-        }
-      };
-    
-      loadData();
-    }, [rerenderToggle]);
     
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
-  
     useEffect(() => {
       const newSeries = [];
       let updatedTime = 0;
-      if (categories !== null) {
-        categories.forEach((category) => {
-          let time = 0;
-          category?.selectedApps.forEach((app) => {
-            const found = appUsages.find((a) => a.app === app);
-            if (found) {
-              newSeries.push(found.time);
-              time += parseInt(found.time);
-            }
-          });
-          updatedTime += time;
-        });
-      }
-        setSeries(newSeries);
-        setAllTimeCalculated(true);
-        setAllTime(updatedTime);
-    }, [rerenderToggle, allTimeCalculated, categories]);
-   
-    const renderAllApps = () => {
-      if (categories === null) {
-        return null;
-      }
-      
-      const renderApps = [];
-    
-      categories.forEach((category, categoryIndex) => {
-        category.selectedApps.forEach((app, appIndex) => {
-          let time = 0;
-          let usageTime = category.usageTime;
-          const found = appUsages.find((a) => a.app === app);
-          if (found) {
-            time = parseInt(found.time);
-          }
-    
-          const appDetails = installedApps.find((value) => value.packageName === app);
-          const usedTime = calculateHoursAndMinutes(time);
-          const leftTime = calculateHoursAndMinutes(usageTime);
-          const colorIndex = appIndex % appColor.length;
-          renderApps.push({
-            appIndex: `${categoryIndex}-${appIndex}`,
-            appBlock: (
-              <View key={`${categoryIndex}-${appIndex}`} style={styles.block}>
-                <Image
-                  source={{ uri: `data:image/png;base64,${appDetails?.icon}` }}
-                  style={styles.img}
-                />
-                <Text style={styles.text}>{appDetails?.label}</Text>
-                <View style={styles.numView2}>
-                  <Text style={styles.number2} />
-                </View>
-                <View style={styles.BarAndTime}>
-                  <DynamicBar
-                    segment1={time}
-                    segment2={usageTime - time}
-                    color={appColor[colorIndex]}
-                    style={styles.DynamicBar}
-                    height={9}
-                  />
-                  <Text style={styles.time}>{usedTime} / {leftTime}</Text>
-                </View>
-              </View>
-            ),
-            time: time,
-          });
-        });
+      installedApps.forEach((app) => {
+        let time = 0;
+        const found = appUsages.find((a) => a.app === app.packageName);
+        if (found) {
+          newSeries.push(found.time);
+          time += parseInt(found.time);
+        }
+        updatedTime += time;
       });
+      const orderedSeries = [...newSeries].sort((a, b) => b - a);
+
+      setSeries(orderedSeries);
+      setAllTimeCalculated(true);
+      setAllTime(updatedTime);
+    }, [rerenderToggle, allTimeCalculated, installedApps]);
+
+    const renderAllApps = () => {
+      const renderApps = [];
+      const sortedApps = [...installedApps].sort((a, b) => {
+        // Assuming that appUsages contains the screen time information for each app
+        const timeA = appUsages.find((usage) => usage.app === a.packageName)?.time || 0;
+        const timeB = appUsages.find((usage) => usage.app === b.packageName)?.time || 0;
+      
+        // Sort by screen time in descending order
+        return timeB - timeA;
+      });
+      let i = 0;
+      sortedApps.forEach((app, index) => {
+        let time = 0;
+        const found = appUsages.find((a) => a.app === app.packageName);
     
+        if (found) {
+          time = parseInt(found.time);
+        }
+        if (time > 0){
+        const usedTime = calculateHoursAndMinutes(time);
+        renderApps.push({
+          appBlock: (
+            <View key={`${index}`} style={styles.block}>
+              <Image
+                source={{ uri: `data:image/png;base64,${app.icon}` }}
+                style={styles.img}
+              />
+              <Text style={styles.text}>{app.label}</Text>
+              <View style={styles.numView2}>
+                <Text style={styles.number2} />
+              </View>
+              <View style={styles.BarAndTime}>
+              <DynamicWidthBar value={time} maxValue={14400} color={appColor[i]} />
+                <Text style={styles.time}>{usedTime}</Text>
+              </View>
+            </View>
+          ),
+          time: time,
+        });
+        i++;
+      }
+      });
       // Sort renderApps array based on screen time in descending order
       renderApps.sort((a, b) => b.time - a.time);
-    
+
       return renderApps.map((app) => app.appBlock);
     };
-
     const renderVisibleApps = showAllApps ? renderAllApps() : renderAllApps().slice(0, 3);
     const renderText = btnText ? 'View less' : 'View more';
     return (
@@ -184,9 +158,11 @@ export default function DayStatistics(){
         <View/>
       )}
           {renderVisibleApps}
-          <Pressable title={showAllApps ? 'Show Top 3 Apps' : 'Show All Apps'} onPress={toggleAppsVisibility} style={styles.button}>
-            <Text style={styles.buttonText}>{renderText}</Text>
+          {series.length > 3 ?
+          <Pressable onPress={toggleAppsVisibility} style={styles.button}>
+              <Text style={styles.buttonText}>{renderText}</Text> 
             </Pressable>
+            : <></>}
         </View>
         </View>
       </ScrollView>
