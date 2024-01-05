@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native";
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
 import { getUsageStats } from '../../helpers/UsageStats';
 import { fetchInstalledApps } from '../../helpers/FetchingApps';
@@ -9,7 +9,6 @@ import { generateCategoryColors } from '../../helpers/ColorUtils';
 import { GenerateBarChart } from '../../helpers/BarChart';
 import { useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import React from "react";
 export default function WeekStatistics(){
     let [currentDate, setCurrentDate] = useState(new Date());
     let [formattedDate, setFormattedDate] = useState(null);
@@ -57,10 +56,10 @@ export default function WeekStatistics(){
     const [allTimeCalculated, setAllTimeCalculated] = useState(false);
     const appColor = useMemo(() => generateCategoryColors(series.length), [series]);
     const [showAllApps, setShowAllApps] = useState(false);
-    const [btnText, setBtnText] = useState(false);
+    const [btnImg, setBtnImg] = useState(false);
     const toggleAppsVisibility = () => {
       setShowAllApps(!showAllApps);
-      setBtnText(!btnText);
+      setBtnImg(!btnImg);
     };
 
     useFocusEffect(
@@ -138,7 +137,7 @@ export default function WeekStatistics(){
       return renderApps.map((app) => app.appBlock);
     };
     const renderVisibleApps = showAllApps ? renderAllApps() : renderAllApps().slice(0, 3);
-    const renderText = btnText ? 'View less' : 'View more';
+    const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
     return (
         <ScrollView vertically={true} style={styles.OuterContainer}>
         <View style={styles.container}>
@@ -162,23 +161,22 @@ export default function WeekStatistics(){
 <></>
       )}
           {renderVisibleApps}
-          <Pressable title={showAllApps ? 'Show Top 3 Apps' : 'Show All Apps'} onPress={toggleAppsVisibility} style={styles.button}>
-            <Text style={styles.buttonText}>{renderText}</Text>
+          {series.length > 3 ?
+          <Pressable onPress={toggleAppsVisibility} style={styles.button}>
+              <Image source={renderImg} style={styles.buttonImg}/>
             </Pressable>
+            : <></>}
         </View>
         </View>
       </ScrollView>
     );
 };
 const styles = StyleSheet.create({
-    buttonText: {
-        color: 'white',
-        fontWeight: '600',
-        fontSize: 14,
-        paddingTop: 7,
-        paddingBottom: 7,
-        textAlign: 'center',
-      },
+  buttonImg: {
+    alignSelf: 'center',
+    marginTop: 12,
+    marginBottom: 12,
+},
       button: {
         marginLeft: 20,
         marginRight: 20,

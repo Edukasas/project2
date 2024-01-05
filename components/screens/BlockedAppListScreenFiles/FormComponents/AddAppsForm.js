@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#191C25',
       borderRadius: 17,
       width: '100%',
-      height: '95%',
+      maxHeight: '95%',
       marginTop: 20,
       alignSelf: 'center',
     },

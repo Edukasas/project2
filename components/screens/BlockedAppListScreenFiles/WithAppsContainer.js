@@ -110,7 +110,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
               onPress={() => handleEditCategory(category)}
               style={styles.biggerBlock}
             >
-              <Image source={require('../../../assets/images/pen.png')}/>
+              <Image source={require('../../../assets/images/edit.png')}/>
               <Text style={styles.Buttons}>Edit</Text>
             </TouchableOpacity>
             <View style={styles.verticalLine} />
@@ -118,7 +118,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
               onPress={() => handleDeleteCategory(category)}
               style={styles.biggerBlock}
             >
-              <Image source={require('../../../assets/images/trashbin.png')}/>
+              <Image source={require('../../../assets/images/delete.png')}/>
               <Text style={styles.Buttons}>Delete</Text>
             </TouchableOpacity>
           </View>

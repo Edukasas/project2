@@ -13,6 +13,8 @@ import PieChart from 'react-native-pie-chart';
 export default function DayStatistics(){
     let [currentDate, setCurrentDate] = useState(new Date());
     let [formattedDate, setFormattedDate] = useState(null);
+
+    //[appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
     useEffect(() => {
         setFormattedDate(`${currentDate.toLocaleString('default', { month: 'long' })} ${currentDate.getDate()}`);
     }, [currentDate]);
@@ -27,9 +29,28 @@ export default function DayStatistics(){
         newDate.setDate(currentDate.getDate() + 1);
         setCurrentDate(newDate);
     };
-
-    let endTime = (new Date()).getTime();
+    // useEffect(() => {
+    //   const updateStatistics = () => {
+    //     const startTime = new Date(currentDate);
+    //     startTime.setMinutes(0);
+    //     startTime.setHours(0);
+    //     const endTime = new Date(currentDate);
+    //     endTime.setDate(currentDate.getDate() + 1);
+    //     endTime.setMinutes(0);
+    //     endTime.setHours(0);
+    //   };
+  
+    //   // Initial data load
+    //   updateStatistics();
+    // }, [currentDate]);
+    // const [endTime, setEndTime] = useState(null);
+    // const [startTime, setStartTime] = useState(null);
+    let endTime = (new Date());
+    endTime.setMinutes(0);
+    endTime.setHours(0);
+    endTime = endTime.getTime();
     let startTime = (new Date());
+    startTime.setDate(startTime.getDate() - 1);
     startTime.setMinutes(0);
     startTime.setHours(0);
     startTime = startTime.getTime();
@@ -44,10 +65,10 @@ export default function DayStatistics(){
     const widthAndHeight = 160;
     const appColor = useMemo(() => generateCategoryColors(series.length), [series]);
     const [showAllApps, setShowAllApps] = useState(false);
-    const [btnText, setBtnText] = useState(false);
+    const [btnImg, setBtnImg] = useState(false);
     const toggleAppsVisibility = () => {
       setShowAllApps(!showAllApps);
-      setBtnText(!btnText);
+      setBtnImg(!btnImg);
     };
 
     useFocusEffect(
@@ -127,7 +148,7 @@ export default function DayStatistics(){
       return renderApps.map((app) => app.appBlock);
     };
     const renderVisibleApps = showAllApps ? renderAllApps() : renderAllApps().slice(0, 3);
-    const renderText = btnText ? 'View less' : 'View more';
+    const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
     return (
       <ScrollView vertically={true} style={styles.OuterContainer}>
         <View style={styles.container}>
@@ -160,7 +181,7 @@ export default function DayStatistics(){
           {renderVisibleApps}
           {series.length > 3 ?
           <Pressable onPress={toggleAppsVisibility} style={styles.button}>
-              <Text style={styles.buttonText}>{renderText}</Text> 
+              <Image source={renderImg} style={styles.buttonImg}/>
             </Pressable>
             : <></>}
         </View>
@@ -169,13 +190,10 @@ export default function DayStatistics(){
     );
 };
 const styles = StyleSheet.create({
-    buttonText: {
-      color: 'white',
-      fontWeight: '600',
-      fontSize: 14,
-      paddingTop: 7,
-      paddingBottom: 7,
-      textAlign: 'center',
+    buttonImg: {
+        alignSelf: 'center',
+        marginTop: 12,
+        marginBottom: 12,
     },
     button: {
       marginLeft: 20,
