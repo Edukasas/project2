@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, Pressable, StyleSheet, View} from 'react-native';
+import  React, {Image, Text, StyleSheet, View} from 'react-native';
 
 export default function EmptyAppContainer(){
-     return(
-        <View>
+     return (
+        <View style={styles.container}>
      <Image
         source={require('../../../assets/images/app_blocking.png')}
         style={styles.logo}
@@ -13,36 +13,14 @@ export default function EmptyAppContainer(){
               </View>
       )}
 const styles = StyleSheet.create({
-    appContainer: {
-      backgroundColor: 'red',
-      borderRadius: 17,
-      width: '80%',
-      alignSelf: 'center',
-    },
-    appItem: {
-      marginTop: 15,
-      marginLeft: 15,
-      gap: 10,
+    container: {
+      marginTop: 194,
       alignItems: 'center',
-      flexDirection: 'row',
-    },
-    appLabel: {
-      color: 'white',
-      fontFamily: 'Roboto-Regular',
-      fontSize: 12,
-    },
-    img: {
-       width: 50,
-       height: 50,
-    },
-    logo: {
-        marginTop: 194,
-        alignSelf: 'center',
+      gap: 24,
+      marginLeft: 65,
+      marginRight: 65,
     },
     Text1: {
-        alignSelf: 'center',
-        marginTop: 24,
-        marginBottom: 24,
         fontFamily: 'Roboto-Bold',
         color: 'white',
         fontSize: 16,
@@ -52,8 +30,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 15,
         textAlign: 'center',
-        alignSelf: 'center',
-        width: 248,
         lineHeight: 17,
     },
 });

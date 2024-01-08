@@ -13,7 +13,7 @@ export default function StatisticsScreen({ navigation }) {
 
   const isDayButtonActive = activeButton === 'day';
   const isWeekButtonActive = activeButton === 'week';
-console.log(isDayButtonActive);
+
   return (
     <View style={styles.Container}>
       <View style={styles.topPart}>

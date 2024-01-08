@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StyleSheet, Image, Text, View, ScrollView} from 'react-native';
+import {StyleSheet, Image, ScrollView} from 'react-native';
 import { useEffect, useState } from 'react';
+import EmptyAppContainer from './HomeScreenFiles/EmptyAppContainer';
 import WithAppsContainer from './HomeScreenFiles/WithAppsContainer';
 import { useFocusEffect } from '@react-navigation/native';
 import React  from 'react';
@@ -40,7 +41,9 @@ return (
   <ScrollView vertically={true} style={styles.OuterContainer}>
   {isStoredDataAvailable ? 
     <WithAppsContainer/>
-      : (<View/>)}
+      : 
+      <EmptyAppContainer/>
+      }
       </ScrollView>
 ); 
 }

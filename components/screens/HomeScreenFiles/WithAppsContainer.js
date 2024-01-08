@@ -256,8 +256,8 @@ Blocks: {
     block: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginLeft: 22,
-      marginRight: 25,
+      marginLeft: 17,
+      marginRight: 17,
       marginTop: 21,
       gap: 13,
       marginBottom: 15,

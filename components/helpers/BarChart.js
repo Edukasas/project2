@@ -14,7 +14,7 @@ const GenerateBarChart = () => {
           labels: ["S", "M", "T", "W", "T", "F", "S"],
           datasets: [
             {
-              data: [20, 45, 28, 80, 99, 43, 15],
+              data: [10, 20, 30, 40, 50, 60, 70],
             },
           ],
         }}

@@ -1,9 +1,8 @@
-import { View, StyleSheet, Image } from 'react-native'; // Added missing imports
+import { View, StyleSheet, Image, KeyboardAvoidingView } from 'react-native'; // Added missing imports
 import { useEffect, useState} from 'react';
 import Initialization from './components/Initialization';
 import MainContainer from './components/MainContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { KeyboardAvoidingView } from 'react-native';
 
 export default function App() {
   const [page, setPage] = useState('Initialization');
