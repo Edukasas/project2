@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, StyleSheet, View, ScrollView, TouchableOpacity, Pressable, TextInput, Alert  } from 'react-native';
+import  React, {Image, Text, StyleSheet, View, ScrollView, Pressable, TextInput  } from 'react-native';
 import { useState,useEffect} from 'react';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TimeForm({ update, returnToApps, categoryToEdit }){
+export default function TimeForm({ update, returnToApps }){
         const { temporaryState, temporaryDispatch } = useTemporaryContext();
         const [categories, setCategories] = useState([]);
         const UsageMinutes = temporaryState.usageTimeMinutes;

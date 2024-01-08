@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Image, Pressable, ScrollView } from 'react-native';
 import React, {useState, useEffect, useMemo} from 'react';
 import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
 import { getUsageStats } from '../../helpers/UsageStats';
@@ -9,26 +9,10 @@ import { generateCategoryColors } from '../../helpers/ColorUtils';
 import FastImage from 'react-native-fast-image';
 import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
-export default function DayStatistics(){
+export default function DayStatistics({transfer}){
     const [currentDate, setCurrentDate] = useState(new Date());
     const [formattedDate, setFormattedDate] = useState(null);
-    const [stateToWatch, setStateToWatch] = useState(false);
-    const [delayedRerender, setDelayedRerender] = useState(false);
-  
-    useEffect(() => {
-      let timeoutId;
-  
-      // Set a timeout to trigger the delayed re-render after 1000 milliseconds (1 second)
-      if (stateToWatch) {
-        timeoutId = setTimeout(() => {
-          setDelayedRerender(true);
-        }, 500);
-      }
-  
-      // Clear the timeout if the stateToWatch changes before the timeout is reached
-      return () => clearTimeout(timeoutId);
-  
-    }, [stateToWatch]);
+
     const [endTime, setEndTime] = useState(() => {
       const thisDate = new Date();
       thisDate.setDate(thisDate.getDate() + 1);
@@ -43,6 +27,7 @@ export default function DayStatistics(){
       thisDate.setHours(0);
       return thisDate.getTime();
     });
+   
     useEffect(() => {
         setFormattedDate(`${currentDate.toLocaleString('default', { month: 'long' })} ${currentDate.getDate()}`);
     }, [currentDate]);
@@ -66,7 +51,6 @@ export default function DayStatistics(){
     
       setEndTime(updatedEndTime);
       setStartTime(updatedStartTime);
-      setStateToWatch(!stateToWatch);
     };
     
     const handlePreviousDate = () => {
@@ -76,8 +60,6 @@ export default function DayStatistics(){
     const handleNextDate = () => {
       updateDate(1);
     };
-    
-
     [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
     const [allTime, setAllTime] = useState(0);
     const [rerenderToggle, setRerenderToggle] = useState(false);
@@ -85,7 +67,6 @@ export default function DayStatistics(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [installedApps, setInstalledApps] = useState([]);
-    const [allTimeCalculated, setAllTimeCalculated] = useState(false);
     const widthAndHeight = 160;
     const appColor = useMemo(() => generateCategoryColors(series.length), [series]);
     const [showAllApps, setShowAllApps] = useState(false);
@@ -101,76 +82,99 @@ export default function DayStatistics(){
         setRerenderToggle((prev) => !prev);
       }, [])
     );
-    
+            
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
 
-    const fetchData = () => {
-      const newSeries = [];
-      const updatedTime = installedApps.reduce((acc, app) => {
-        const found = appUsages.find((a) => a.app === app.packageName);
-        if (found) {
-          newSeries.push(found.time);
-          return acc + parseInt(found.time);
-        }
-        return acc;
-      }, 0);
-  
-      const sortedSeries = [...newSeries].sort((a, b) => b - a);
-      setSeries(sortedSeries);
-      setAllTimeCalculated(true);
-      setAllTime(updatedTime);
-    };
-  
-    useEffect(() => {
-      if (delayedRerender) {
-        fetchData();
-        console.log('Labas');
-        setDelayedRerender(false);
-      }
-    }, [rerenderToggle, delayedRerender, installedApps]);
+    
+      const memoizedRenderApps = useMemo(() => {
+        
+        const dataMap = {};
+        const updatedTime = installedApps.reduce((acc, app) => {
+          const found = appUsages.find((a) => a.app === app.packageName);
+          if (found) {
+            dataMap[app.packageName] = {
+              time: parseInt(found.time),
+              label: app.label,
+              icon: app.icon,
+            };
+            return acc + parseInt(found.time);
+          }
+          return acc;
+        }, 0);
 
-    const renderAllApps = () => {
-      const renderApps = [];
-      const appUsagesMap = new Map(appUsages.map((usage) => [usage.app, usage]));
-    
-      const sortedApps = installedApps.slice().sort((a, b) => {
-        const timeA = (appUsagesMap.get(a.packageName) || {}).time || 0;
-        const timeB = (appUsagesMap.get(b.packageName) || {}).time || 0;
-        return timeB - timeA;
-      });
-    
-      sortedApps.forEach((app, index) => {
-        const usage = appUsagesMap.get(app.packageName);
-        if (usage && parseInt(usage.time) > 0) {
-          const time = parseInt(usage.time);
+          const sortedObject = Object.values(dataMap).sort((a, b) => b.time - a.time);
+          const sortedSeries = Object.values(dataMap).map(data => data.time).sort((a, b) => b - a);
+         
+        setSeries(sortedSeries);
+        setAllTime(updatedTime);
+        const renderApps = [];
+      
+        for (let i = 0; i < sortedObject.length; i++) {
+          const time = parseInt(Object.values(sortedObject)[i].time);
           const usedTime = calculateHoursAndMinutes(time);
+          const currentApp = Object.values(sortedObject)[i];
+      
           renderApps.push(
-            <View key={`${index}`} style={styles.block}>
+            <View key={`${i}`} style={styles.block}>
               <FastImage
-                source={{ uri: `data:image/png;base64,${app.icon}` }}
+                source={{ uri: `data:image/png;base64,${currentApp.icon}` }}
                 style={styles.img}
               />
-              <Text style={styles.text}>{app.label}</Text>
+              <Text style={styles.text}>{currentApp.label}</Text>
               <View style={styles.numView2}>
                 <Text style={styles.number2} />
               </View>
               <View style={styles.BarAndTime}>
-                <DynamicWidthBar value={time} maxValue={14400} color={appColor[index]} />
+                <DynamicWidthBar value={time} maxValue={14400} color={appColor[i]} />
                 <Text style={styles.time}>{usedTime}</Text>
               </View>
             </View>
           );
         }
-      });
-    
-      return renderApps;
-    };
-    const renderVisibleApps = showAllApps ? renderAllApps() : renderAllApps().slice(0, 3);
+        return renderApps;
+      }, [rerenderToggle, startTime, endTime]);
+     const renderVisibleApps = showAllApps ? memoizedRenderApps : memoizedRenderApps.slice(0, 3);
     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
+  
     return (
       <ScrollView vertically={true} style={styles.OuterContainer}>
+              <View style={styles.topPart}>
+        <View
+          style={[
+            styles.topPartButton,
+            { backgroundColor:'#191C25'},
+          ]}
+        >
+          <Text
+            style={[
+              styles.topPartButtonText,
+              { color:'#BBC4EC'},
+              { fontWeight: '700'},
+            ]}
+          >
+            Day
+          </Text>
+        </View>
+        <Pressable
+          style={[
+            styles.topPartButton,
+            { backgroundColor: '#010101' },
+          ]}
+          onPress={() => transfer()}
+        >
+          <Text
+            style={[
+              styles.topPartButtonText,
+              { color: '#FFFFFF' },
+              { fontWeight: '400' },
+            ]}
+          >
+            Week
+          </Text>
+        </Pressable>
+      </View>
         <View style={styles.container}>
             <View style={styles.dateScreen}>
                 <View style={styles.pressableWrapper}>
@@ -190,7 +194,7 @@ export default function DayStatistics(){
             <Text style={styles.BlockName}>Screen Time</Text>
             <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
           </View>
-          {appColor.length === series.length && series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
+          {series.reduce((acc, val) => acc + val, 0) > 0 ? (
         <PieChart
           style={styles.PieChart}
           widthAndHeight={widthAndHeight}
@@ -205,7 +209,7 @@ export default function DayStatistics(){
           {renderVisibleApps}
           {series.length > 3 ?
           <Pressable onPress={toggleAppsVisibility} style={styles.button}>
-              <FastImage source={renderImg} style={styles.buttonImg}/>
+              <Image source={renderImg} style={styles.buttonImg}/>
             </Pressable>
             : <></>}
         </View>
@@ -214,6 +218,29 @@ export default function DayStatistics(){
     );
 };
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 10,
+  },
+  topPart: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 16,
+  },
+  topPartButton: {
+    color: '#BBC4EC',
+    backgroundColor: '#191C25',
+    fontSize: 14,
+    fontWeight: '700',
+    borderRadius: 17,
+    margin: 5,
+  },
+  topPartButtonText: {
+    marginRight: 65,
+    marginLeft: 65,
+    marginTop: 9,
+    marginBottom: 9,
+    textAlign: 'center',
+  },
   pressableWrapper: {
     padding: 10,
   },

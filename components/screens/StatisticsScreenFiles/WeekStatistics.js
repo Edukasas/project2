@@ -9,7 +9,7 @@
 // import { GenerateBarChart } from '../../helpers/BarChart';
 // import { useMemo } from 'react';
 // import { useFocusEffect } from '@react-navigation/native';
-// export default function WeekStatistics(){
+// export default function WeekStatistics({transfer}){
 //     let [currentDate, setCurrentDate] = useState(new Date());
 //     let [formattedDate, setFormattedDate] = useState(null);
 
@@ -172,6 +172,41 @@
 //     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
 //     return (
 //         <ScrollView vertically={true} style={styles.OuterContainer}>
+//            <View style={styles.topPart}>
+//            <Pressable
+//           style={[
+//             styles.topPartButton,
+//             { backgroundColor: '#010101' },
+//           ]}
+//           onPress={() => transfer()}
+//         >
+//           <Text
+//             style={[
+//               styles.topPartButtonText,
+//               { color: '#FFFFFF' },
+//               { fontWeight: '400' },
+//             ]}
+//           >
+//             Day
+//           </Text>
+//         </Pressable>
+//         <View
+//           style={[
+//             styles.topPartButton,
+//             { backgroundColor:'#191C25'},
+//           ]}
+//         >
+//           <Text
+//             style={[
+//               styles.topPartButtonText,
+//               { color:'#BBC4EC'},
+//               { fontWeight: '700'},
+//             ]}
+//           >
+//             Week
+//           </Text>
+//         </View>
+//       </View>
 //         <View style={styles.container}>
 //             <View style={styles.dateScreen}>
 //                 <Pressable onPress={handlePreviousDate}>
@@ -204,6 +239,29 @@
 //     );
 // };
 // const styles = StyleSheet.create({
+//   container: {
+//     marginBottom: 10,
+//   },
+//   topPart: {
+//     flexDirection: 'row',
+//     alignSelf: 'center',
+//     marginTop: 16,
+//   },
+//   topPartButton: {
+//     color: '#BBC4EC',
+//     backgroundColor: '#191C25',
+//     fontSize: 14,
+//     fontWeight: '700',
+//     borderRadius: 17,
+//     margin: 5,
+//   },
+//   topPartButtonText: {
+//     marginRight: 65,
+//     marginLeft: 65,
+//     marginTop: 9,
+//     marginBottom: 9,
+//     textAlign: 'center',
+//   },
 //         buttonImg: {
 //           alignSelf: 'center',
 //           marginTop: 12,
@@ -311,11 +369,4 @@
 //           BarAndTime: {
 //             alignItems: 'flex-end',
 //           },
-//           DynamicBar: {
-//               width: 150,
-//               alignSelf: 'flex-end',
-//             },
-//             PieChart: {
-//               alignSelf: 'center',
-//            },
 // });
