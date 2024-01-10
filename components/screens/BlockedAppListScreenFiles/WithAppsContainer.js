@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import React, { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
-import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
+import React, { useEffect, useState, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DynamicBar } from '../../helpers/DynamicBar';
 import { getUsageStats } from '../../helpers/UsageStats';
@@ -8,8 +8,7 @@ import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
-
-  let endTime = (new Date()).getTime();
+  let endTime = Date.now();
   let startTime = (new Date());
   startTime.setMinutes(0);
   startTime.setHours(0);
@@ -32,7 +31,6 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       // Remove the category from the state
       const updatedCategories = categories.filter((cat) => cat !== category);
       setCategories(updatedCategories);
-  
       // Save the updated categories to AsyncStorage
       await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
 
@@ -41,22 +39,18 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       console.error('Error deleting category:', error);
     }
   };
+  
   useEffect(() => {
     const loadData = async () => {
       await loadCategories(setCategories, setLoading, setError);
     };
     loadData();
   }, []);
+  
   useEffect(() => {
     fetchInstalledApps(setInstalledApps, setLoading, setError);
   }, []);
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
-
-  if (error) {
-    return <Text>Error: {error}</Text>;
-  }
+  
   const renderCategoryBlocks = () => {
     if (categories === null) {
       return null;
@@ -127,9 +121,10 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       );
     });
   };
+  const memoizedCategoryBlocks = useMemo(() => renderCategoryBlocks(), [categories, selectedCategory]);
   return (
     <ScrollView style={styles.scrollViewContainer}>
-    {renderCategoryBlocks()}
+    {memoizedCategoryBlocks}
   </ScrollView>
   );
 }
@@ -154,10 +149,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   verticalLine: {
-    height: '80%', // Adjust the height as needed
+    height: '80%',
     width: 1,
-    backgroundColor: '#3A3D44', // Change the color as needed
-    marginHorizontal: 10, // Adjust the margin as needed
+    backgroundColor: '#3A3D44',
+    marginHorizontal: 10,
   },
   border: {
     borderBottomWidth: 1,
@@ -206,7 +201,7 @@ const styles = StyleSheet.create({
   numView: {
     flex: 1,
     alignItems: 'flex-end',
-    justifyContent: 'flex-start', 
+    justifyContent: 'flex-start',
   },
   number: {
     fontSize: 11,

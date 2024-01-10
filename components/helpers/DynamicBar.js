@@ -1,5 +1,6 @@
 import Svg, { Rect } from 'react-native-svg';
-import React, { View } from 'react-native';
+import { View } from 'react-native';
+import React from "react";
 const DynamicBar = ({ segment1, segment2, color, style, height}) => {
   const total = segment1 + segment2;
 const normalizedSegment1 = (segment1 / total) * 100;

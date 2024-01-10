@@ -1,16 +1,16 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, StyleSheet, View, ScrollView, Pressable, TextInput  } from 'react-native';
-import { useState,useEffect} from 'react';
+import {Image, Text, StyleSheet, View, ScrollView, Pressable, TextInput  } from 'react-native';
+import React, { useState,useEffect} from 'react';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TimeForm({ update, returnToApps }){
         const { temporaryState, temporaryDispatch } = useTemporaryContext();
         const [categories, setCategories] = useState([]);
-        const UsageMinutes = temporaryState.usageTimeMinutes;
-        const UsageSeconds = temporaryState.usageTimeSeconds;
-        const BlockedMinutes = temporaryState.blockedTimeMinutes;
-        const BlockedSeconds = temporaryState.blockedTimeSeconds;
+        const usageMinutes = temporaryState.usageTimeMinutes;
+        const usageSeconds = temporaryState.usageTimeSeconds;
+        const blockedMinutes = temporaryState.blockedTimeMinutes;
+        const blockedSeconds = temporaryState.blockedTimeSeconds;
         const isEditing = temporaryState.editingCategory;
         const customCategoryName = temporaryState.customCategoryName;
         const isValidInput = (text) => /^\d+$/.test(text) || text === '';
@@ -28,11 +28,11 @@ export default function TimeForm({ update, returnToApps }){
           loadData();
         }, []);
         const handleSubmit = async() => {
-          if ((UsageMinutes || UsageSeconds) && (BlockedMinutes || BlockedSeconds)){
-            const parsedUsageMinutes = parseInt(UsageMinutes) || 0;
-            const parsedUsageSeconds = parseInt(UsageSeconds) || 0;
-            const parsedBlockedMinutes = parseInt(BlockedMinutes) || 0;
-            const parsedBlockedSeconds = parseInt(BlockedSeconds) || 0;
+          if ((usageMinutes || usageSeconds) && (blockedMinutes || blockedSeconds)){
+            const parsedUsageMinutes = parseInt(usageMinutes) || 0;
+            const parsedUsageSeconds = parseInt(usageSeconds) || 0;
+            const parsedBlockedMinutes = parseInt(blockedMinutes) || 0;
+            const parsedBlockedSeconds = parseInt(blockedSeconds) || 0;
             const usageTime = parsedUsageMinutes * 60 + parsedUsageSeconds;
             const blockedTime = parsedBlockedMinutes * 60 + parsedBlockedSeconds;
                   const newCategory = {
@@ -104,7 +104,7 @@ export default function TimeForm({ update, returnToApps }){
             }
           };
     return (
-   
+
 
 <ScrollView vertically={true} style={styles.timeContainer} keyboardShouldPersistTaps="handled">
               <View style={styles.topPart}>

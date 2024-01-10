@@ -12,7 +12,6 @@ import PieChart from 'react-native-pie-chart';
 export default function DayStatistics({transfer}){
     const [currentDate, setCurrentDate] = useState(new Date());
     const [formattedDate, setFormattedDate] = useState(null);
-
     const [endTime, setEndTime] = useState(() => {
       const thisDate = new Date();
       thisDate.setDate(thisDate.getDate() + 1);
@@ -42,15 +41,15 @@ export default function DayStatistics({transfer}){
       newEndTime.setMinutes(0);
       newEndTime.setHours(0);
       const updatedEndTime = newEndTime.getTime();
-    
       const newStartTime = new Date(startTime);
       newStartTime.setDate(newStartTime.getDate() + offset);
       newStartTime.setMinutes(0);
       newStartTime.setHours(0);
       const updatedStartTime = newStartTime.getTime();
-    
       setEndTime(updatedEndTime);
       setStartTime(updatedStartTime);
+     
+     
     };
     
     const handlePreviousDate = () => {
@@ -82,14 +81,11 @@ export default function DayStatistics({transfer}){
         setRerenderToggle((prev) => !prev);
       }, [])
     );
-            
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
 
-    
       const memoizedRenderApps = useMemo(() => {
-        
         const dataMap = {};
         const updatedTime = installedApps.reduce((acc, app) => {
           const found = appUsages.find((a) => a.app === app.packageName);

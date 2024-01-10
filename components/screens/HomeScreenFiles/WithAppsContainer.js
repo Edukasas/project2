@@ -1,22 +1,24 @@
 /* eslint-disable prettier/prettier */
 import {StyleSheet, Image, Text, View, ScrollView} from 'react-native';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { DynamicBar } from '../../helpers/DynamicBar';
 import { getUsageStats } from '../../helpers/UsageStats';
 import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 import { generateCategoryColors } from '../../helpers/ColorUtils';
-import { useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
-import React  from 'react';
 export default function WithAppsContainer() {
-  let endTime = (new Date()).getTime();
-  let startTime = (new Date());
-  startTime.setMinutes(0);
-  startTime.setHours(0);
-  startTime = startTime.getTime();
+  const { startTime, endTime } = useMemo(() => {
+    const currentTime = Date.now();
+    const start = new Date();
+    start.setMinutes(0);
+    start.setHours(0);
+    const startTime = start.getTime();
+    console.log('Labas');
+    return { startTime, endTime: currentTime };
+  }, []);
   [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
   let [allTime, setAllTime] = useState(0);
   const [rerenderToggle, setRerenderToggle] = useState(false);
@@ -26,7 +28,6 @@ export default function WithAppsContainer() {
   const [categories, setCategories] = useState([]);
   const [installedApps, setInstalledApps] = useState([]);
   const [allTimeCalculated, setAllTimeCalculated] = useState(false);
-  
   const widthAndHeight = 160;
   const categoryColors = useMemo(() => generateCategoryColors(categories.length), [categories]);
   useFocusEffect(
@@ -79,6 +80,7 @@ export default function WithAppsContainer() {
     if (categories === null) {
       return null;
     }
+
     const renderBlocks = categories.map((category, index) => {
       const firstSelectedAppPackage = category?.selectedApps[0];
       let time = 0;
@@ -123,7 +125,7 @@ const renderAllApps = () => {
   if (categories === null) {
     return null;
   }
-  
+
   const renderApps = [];
   
   categories.forEach((category, categoryIndex) => {
@@ -164,9 +166,13 @@ const renderAllApps = () => {
       );
     });
   });
-
   return renderApps;
 };
+
+const memoizedCategoryBlocks = useMemo(() => renderCategoryBlocks(), [categories]);
+const memoizedAllApps = useMemo(() => renderAllApps(), [categories]);
+
+
 return (
   <ScrollView vertically={true} style={styles.OuterContainer}>
 
@@ -186,15 +192,15 @@ return (
           coverFill={'#191C25'}
         />
       ) : (
-        <View/>
+        <></>
       )}
-          {renderCategoryBlocks()}
+          {memoizedCategoryBlocks}
         </View>
         <View style={styles.Blocks}>
           <View style={styles.topPart}>
             <Text style={styles.BlockName}>App timers</Text>
           </View>
-          {renderAllApps()}
+          {memoizedAllApps}
         </View>
       </View>
       </ScrollView>

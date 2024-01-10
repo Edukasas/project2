@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, StyleSheet, View, TouchableOpacity, Pressable, TextInput, Animated, FlatList} from 'react-native';
-import { useEffect, useState, useRef} from 'react';
+import {Image, Text, StyleSheet, View, TouchableOpacity, Pressable, TextInput, Animated, FlatList} from 'react-native';
+import React, { useEffect, useState, useRef} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import FastImage from 'react-native-fast-image';
@@ -142,8 +142,10 @@ const styles = StyleSheet.create({
     },
     next: {
       alignSelf: 'center',
+      padding: 10,
     },
     cancel: {
+      padding: 10,
       alignSelf: 'center',
     },
     button: {
@@ -189,8 +191,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderBottomColor: 'black',
-        marginLeft: 20,
-        marginRight: 20,
+        marginHorizontal: 20,
         borderBottomWidth: 1,
         borderColor: '#3A3D44',
         paddingTop: 10,

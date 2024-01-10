@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { View, Text, Image, StyleSheet } from "react-native";
-
+import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
+const windowHeight = Dimensions.get('window').height/100*80;
 export default function EmptyAppContainer(){
     return(
         <View style={styles.container}>
@@ -15,12 +15,11 @@ export default function EmptyAppContainer(){
 }
 const styles = StyleSheet.create({
     container: {
-        marginTop: 200,
-        marginRight: 65,
-        marginLeft: 65,
-        flex: 1,
-        gap: 24,
+        justifyContent: 'center',
         alignItems: 'center',
+        height: windowHeight,
+        paddingHorizontal: 70,
+        gap: 10,
     },
     upperText: {
         fontWeight: '700',

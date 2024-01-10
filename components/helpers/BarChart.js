@@ -2,6 +2,7 @@ import React from "react";
 import { Dimensions } from "react-native";
 import {BarChart} from "react-native-chart-kit";
 const GenerateBarChart = () => {
+
     const screenWidth = Dimensions.get("window").width;
   
     return (

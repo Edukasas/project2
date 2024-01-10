@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import  React, {Image, Text, StyleSheet, View} from 'react-native';
-
+import {Image, Text, StyleSheet, View, Dimensions} from 'react-native';
+import React from 'react';
+const windowHeight = Dimensions.get('window').height / 100 * 45;
 export default function EmptyAppContainer(){
      return (
         <View style={styles.container}>
@@ -14,11 +15,11 @@ export default function EmptyAppContainer(){
       )}
 const styles = StyleSheet.create({
     container: {
-      marginTop: 194,
       alignItems: 'center',
-      gap: 24,
-      marginLeft: 65,
-      marginRight: 65,
+      justifyContent: 'flex-end',
+      gap: 10,
+      paddingHorizontal: 65,
+      height: windowHeight,
     },
     Text1: {
         fontFamily: 'Roboto-Bold',

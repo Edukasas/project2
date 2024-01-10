@@ -1,6 +1,11 @@
 import { NativeModules } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 function getUsageStats(startTime, endTime) {
+  // const renders = useRef(0);
+  // useEffect(() => {
+  //   renders.current += 1;
+  //   console.log(`GenerateBarChart renders: ${renders.current}`);
+  // });
     const {UsageStatsModule} = NativeModules;
     [appUsages, setAppUsages] = useState([]);
     UsageStatsModule.getStats(startTime, endTime, stats => {
