@@ -11,16 +11,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
 export default function WithAppsContainer() {
   const { startTime, endTime } = useMemo(() => {
-    const currentTime = Date.now();
+    const currentTime = new Date();
     const start = new Date();
     start.setMinutes(0);
     start.setHours(0);
     const startTime = start.getTime();
-    console.log('Labas');
-    return { startTime, endTime: currentTime };
+    return { startTime, endTime: currentTime.getTime() };
   }, []);
-  [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
-  let [allTime, setAllTime] = useState(0);
+  const [appUsages, setAppUsages] = useState([]);
+  const [allTime, setAllTime] = useState(0);
   const [rerenderToggle, setRerenderToggle] = useState(false);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +46,19 @@ export default function WithAppsContainer() {
   
     loadData();
   }, [rerenderToggle]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getUsageStats(startTime, endTime);
+        setAppUsages(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [startTime, endTime]);
   
   useEffect(() => {
     fetchInstalledApps(setInstalledApps, setLoading, setError);

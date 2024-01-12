@@ -48,8 +48,6 @@ export default function DayStatistics({transfer}){
       const updatedStartTime = newStartTime.getTime();
       setEndTime(updatedEndTime);
       setStartTime(updatedStartTime);
-     
-     
     };
     
     const handlePreviousDate = () => {
@@ -59,7 +57,7 @@ export default function DayStatistics({transfer}){
     const handleNextDate = () => {
       updateDate(1);
     };
-    [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
+    const [appUsages, setAppUsages] = useState([]);
     const [allTime, setAllTime] = useState(0);
     const [rerenderToggle, setRerenderToggle] = useState(false);
     const [series, setSeries] = useState([]);
@@ -84,7 +82,18 @@ export default function DayStatistics({transfer}){
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
-
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getUsageStats(startTime, endTime);
+          setAppUsages(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+  
+      fetchData();
+    }, [startTime, endTime]);
       const memoizedRenderApps = useMemo(() => {
         const dataMap = {};
         const updatedTime = installedApps.reduce((acc, app) => {
@@ -102,16 +111,14 @@ export default function DayStatistics({transfer}){
 
           const sortedObject = Object.values(dataMap).sort((a, b) => b.time - a.time);
           const sortedSeries = Object.values(dataMap).map(data => data.time).sort((a, b) => b - a);
-         
         setSeries(sortedSeries);
         setAllTime(updatedTime);
+        const barColor =  generateCategoryColors(sortedSeries.length);
         const renderApps = [];
-      
         for (let i = 0; i < sortedObject.length; i++) {
           const time = parseInt(Object.values(sortedObject)[i].time);
           const usedTime = calculateHoursAndMinutes(time);
           const currentApp = Object.values(sortedObject)[i];
-      
           renderApps.push(
             <View key={`${i}`} style={styles.block}>
               <FastImage
@@ -123,14 +130,14 @@ export default function DayStatistics({transfer}){
                 <Text style={styles.number2} />
               </View>
               <View style={styles.BarAndTime}>
-                <DynamicWidthBar value={time} maxValue={14400} color={appColor[i]} />
+                <DynamicWidthBar value={time} maxValue={14400} color={barColor[i]} />
                 <Text style={styles.time}>{usedTime}</Text>
               </View>
             </View>
           );
         }
         return renderApps;
-      }, [rerenderToggle, startTime, endTime]);
+      }, [rerenderToggle, appUsages]);
      const renderVisibleApps = showAllApps ? memoizedRenderApps : memoizedRenderApps.slice(0, 3);
     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
   
@@ -158,7 +165,10 @@ export default function DayStatistics({transfer}){
             styles.topPartButton,
             { backgroundColor: '#010101' },
           ]}
-          onPress={() => transfer()}
+          onPress={() => {
+            transfer();
+            setRerenderToggle((prev) => !prev);
+          }}
         >
           <Text
             style={[

@@ -8,12 +8,15 @@ import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
-  let endTime = Date.now();
-  let startTime = (new Date());
-  startTime.setMinutes(0);
-  startTime.setHours(0);
-  startTime = startTime.getTime();
-  [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
+  const { startTime, endTime } = useMemo(() => {
+    const currentTime = new Date();
+    const start = new Date();
+    start.setMinutes(0);
+    start.setHours(0);
+    const startTime = start.getTime();
+    return { startTime, endTime: currentTime.getTime() };
+  }, []);
+  const [appUsages, setAppUsages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,13 +36,23 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       setCategories(updatedCategories);
       // Save the updated categories to AsyncStorage
       await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-
       setIsStoredDataAvailable(updatedCategories.length > 0);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
   };
-  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getUsageStats(startTime, endTime);
+        setAppUsages(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [startTime, endTime]);
   useEffect(() => {
     const loadData = async () => {
       await loadCategories(setCategories, setLoading, setError);
@@ -121,7 +134,7 @@ export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
       );
     });
   };
-  const memoizedCategoryBlocks = useMemo(() => renderCategoryBlocks(), [categories, selectedCategory]);
+  const memoizedCategoryBlocks = useMemo(() => renderCategoryBlocks(), [categories, selectedCategory, appUsages]);
   return (
     <ScrollView style={styles.scrollViewContainer}>
     {memoizedCategoryBlocks}

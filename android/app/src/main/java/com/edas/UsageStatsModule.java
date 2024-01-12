@@ -2,6 +2,7 @@ package com.edas;
 
 import android.widget.Toast;
 
+// import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -9,6 +10,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 
+import android.util.Log;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -50,28 +52,7 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
 
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-yyyy HH:mm:ss");
   public static final String TAG = UsageStatsModule.class.getSimpleName();
-  // @SuppressWarnings("ResourceType")
-  // public static void getStats(Context context){
-  //   UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
-  //   int interval = UsageStatsManager.INTERVAL_YEARLY;
-  //   Calendar calendar = Calendar.getInstance();
-  //   long endTime = calendar.getTimeInMillis();
-  //   calendar.add(Calendar.YEAR, -1);
-  //   long startTime = calendar.getTimeInMillis();
-  //
-  //   Log.d(TAG, "Range start:" + dateFormat.format(startTime) );
-  //   Log.d(TAG, "Range end:" + dateFormat.format(endTime));
-  //
-  //   UsageEvents uEvents = usm.queryEvents(startTime,endTime);
-  //   while (uEvents.hasNextEvent()){
-  //     UsageEvents.Event e = new UsageEvents.Event();
-  //     uEvents.getNextEvent(e);
-  //
-  //     if (e != null){
-  //       Log.d(TAG, "Event: " + e.getPackageName() + "\t" +  e.getTimeStamp());
-  //     }
-  //   }
-  // }
+
 
   public static List getDates(int durationInDays){
     List dates = getDateRangeFromNow(Calendar.DATE, -(durationInDays));
@@ -80,7 +61,7 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
   }
 
   public static List getDateRangeFromNow(int field, int amount){
-  // public static List getDateRangeFromNow(int field, int amount){
+  
     List dates = new ArrayList();
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.DATE, 2);
@@ -89,13 +70,6 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
     calendar2.add(field, amount);
     long startTime = calendar2.getTimeInMillis();
 
-
-    // TESTING 1 2 3...
-    // SimpleDateFormat formatOne = new SimpleDateFormat("yyyy-MM-dd");
-    // String dateOne = formatOne.format(startTime);
-    // String dateTwo = formatOne.format(endTime);
-    // Toast.makeText(getReactApplicationContext(), dateOne, Toast.LENGTH_SHORT).show();
-    // Toast.makeText(getReactApplicationContext(), dateTwo, Toast.LENGTH_SHORT).show();
 
     dates.add(startTime);
     dates.add(endTime);
@@ -119,41 +93,12 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
 
   public static Map<String, UsageStats> getAggregateStatsMap(Context context, double startTime, double endTime){
     UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
-    // Calendar calendar = Calendar.getInstance();
-    // long endTime = calendar.getTimeInMillis();
-    // calendar.add(Calendar.YEAR, -1);
-    // long startTime = calendar.getTimeInMillis();
-    // Calendar cal = Calendar.getInstance();
 
-    // long endTime = cal.getTimeInMillis();
-    // cal.add(Calendar.HOUR, -1);
-    // long startTime = cal.getTimeInMillis();
 
     Map<String, UsageStats> aggregateStatsMap = usm.queryAndAggregateUsageStats((long)startTime,(long)endTime);
     return aggregateStatsMap;
   }
 
-  // See here for more help:
-  // https://github.com/ColeMurray/UsageStatsSample/blob/master/app/src/main/java/com/murraycole/appusagesample/UStats.java
-  // public static String printUsageStats(List<UsageStats> usageStatsList){
-  //   String statsString = new String();
-  //   statsString = statsString + "hello";
-  //   for (UsageStats u : usageStatsList){
-  //     // statsString = statsString + "Pkg: " + u.getPackageName() +  "\t" + "ForegroundTime: "
-  //     //   + u.getTotalTimeInForeground() + "\n";
-  //     statsString = statsString + "!";
-  //   }
-  //   return statsString;
-  // }
-
-  // public static void printCurrentUsageStatus(Context context){
-  //   printUsageStats(getUsageStatsList(context));
-  // }
-  // @SuppressWarnings("ResourceType")
-  // private static UsageStatsManager getUsageStatsManager(Context context){
-  //   UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
-  //   return usm;
-  // }
 
   public static String getStatsString(Map<String, UsageStats> aggregateStats){
     List appsCollection = new ArrayList();
@@ -190,8 +135,6 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
         try {
           String stats = getStatsString(getAggregateStatsMap(getReactApplicationContext(), startTime, endTime));
 
-          // List dates = getDates(durationInDays);
-
           successCallback.invoke(stats);
         } catch (Exception e) {
           String errorMessage = e.getMessage();
@@ -202,11 +145,30 @@ public class UsageStatsModule extends ReactContextBaseJavaModule {
         Toast.makeText(getReactApplicationContext(), noticeMessage, Toast.LENGTH_SHORT).show();
       }
     }
+//   @ReactMethod
+// public void getStats(double startTime, double endTime, final Promise promise) {
+//       if (startTime < endTime) {
+//         try {
+//           String stats = getStatsString(getAggregateStatsMap(getReactApplicationContext(), startTime, endTime));
 
+//           promise.resolve(stats);
+//         } catch (Exception e) {
+//           String errorMessage = e.getMessage();
+//           Toast.makeText(getReactApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+//           promise.reject("Exception", errorMessage);
+//         }
+//       } else {
+//         String noticeMessage = "Enter start time greather than endtime!";
+//         Toast.makeText(getReactApplicationContext(), noticeMessage, Toast.LENGTH_SHORT).show();
+
+//         promise.reject("InvalidTimeRange", noticeMessage);
+//       }
+//     }
   @ReactMethod
   public void testToast(
     int duration) {
       String test = "It works!";
       Toast.makeText(getReactApplicationContext(), test, duration).show();
     }
+  
 }

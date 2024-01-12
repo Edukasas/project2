@@ -76,7 +76,7 @@ export default function WeekStatistics({transfer}){
       return thisDate.getTime();
     });
 
-    [appUsages, setAppUsages] = useState(getUsageStats(startTime, endTime));
+    const [appUsages, setAppUsages] = useState([]);
     let [allTime, setAllTime] = useState(0);
     const [rerenderToggle, setRerenderToggle] = useState(false);
     const [series, setSeries] = useState([]);
@@ -102,6 +102,18 @@ export default function WeekStatistics({transfer}){
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
     useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getUsageStats(startTime, endTime);
+          setAppUsages(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+  
+      fetchData();
+    }, [startTime, endTime]);
+    useEffect(() => {
       const newSeries = [];
       let updatedTime = 0;
       installedApps.forEach((app) => {
@@ -119,7 +131,7 @@ export default function WeekStatistics({transfer}){
       setAllTimeCalculated(true);
       setAllTime(updatedTime);
       
-    }, [rerenderToggle, allTimeCalculated, installedApps]);
+    }, [rerenderToggle, appUsages]);
 
     const renderAllApps = () => {
       const renderApps = [];
@@ -164,7 +176,7 @@ export default function WeekStatistics({transfer}){
       renderApps.sort((a, b) => b.time - a.time);
       return renderApps.map((app) => app.appBlock);
     };
-    const memoizedAllApps = useMemo(() => renderAllApps(), [endTime, startTime, rerenderToggle]);
+    const memoizedAllApps = useMemo(() => renderAllApps(), [appUsages, rerenderToggle]);
     const renderVisibleApps = showAllApps ? memoizedAllApps : memoizedAllApps.slice(0, 3);
     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
     return (
