@@ -25,7 +25,7 @@ export default function App() {
     try {
       await AsyncStorage.setItem('isStarted', '1');
     } catch (e) {
-      // Handle errors if necessary
+      console.log('error');
     }
   }
 

@@ -60,7 +60,6 @@ const temporaryReducer = (state, action) => {
       return state;
   }
 };
-console.log(TemporaryContext);
 export const TemporaryProvider = ({ children }) => {
   const [temporaryState, temporaryDispatch] = useReducer(
     temporaryReducer,

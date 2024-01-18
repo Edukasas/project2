@@ -7,11 +7,17 @@ import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 import { generateCategoryColors } from '../../helpers/ColorUtils';
 import FastImage from 'react-native-fast-image';
-import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
 export default function DayStatistics({transfer}){
     const [currentDate, setCurrentDate] = useState(new Date());
     const [formattedDate, setFormattedDate] = useState(null);
+    const [maxEndTime, setMaxEndTime] = useState(() => {
+      const thisDate = new Date();
+      thisDate.setDate(thisDate.getDate() + 1);
+      thisDate.setMinutes(0);
+      thisDate.setHours(0);
+      return thisDate.getTime();
+    });
     const [endTime, setEndTime] = useState(() => {
       const thisDate = new Date();
       thisDate.setDate(thisDate.getDate() + 1);
@@ -59,7 +65,6 @@ export default function DayStatistics({transfer}){
     };
     const [appUsages, setAppUsages] = useState([]);
     const [allTime, setAllTime] = useState(0);
-    const [rerenderToggle, setRerenderToggle] = useState(false);
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -73,12 +78,6 @@ export default function DayStatistics({transfer}){
       setBtnImg(!btnImg);
     };
 
-    useFocusEffect(
-      React.useCallback(() => {
-        console.log('Screen is focused. Rerendering...'); // Add this line for debugging
-        setRerenderToggle((prev) => !prev);
-      }, [])
-    );
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
@@ -137,13 +136,13 @@ export default function DayStatistics({transfer}){
           );
         }
         return renderApps;
-      }, [rerenderToggle, appUsages]);
+      }, [appUsages]);
      const renderVisibleApps = showAllApps ? memoizedRenderApps : memoizedRenderApps.slice(0, 3);
     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
   
     return (
       <ScrollView vertically={true} style={styles.OuterContainer}>
-              <View style={styles.topPart}>
+              <View style={styles.dayAndWeek}>
         <View
           style={[
             styles.topPartButton,
@@ -167,7 +166,6 @@ export default function DayStatistics({transfer}){
           ]}
           onPress={() => {
             transfer();
-            setRerenderToggle((prev) => !prev);
           }}
         >
           <Text
@@ -189,11 +187,12 @@ export default function DayStatistics({transfer}){
                     </Pressable>
                 </View>
                 <Text style={styles.date}>{formattedDate}</Text>
-                <View style={styles.pressableWrapper}>
-                    <Pressable onPress={handleNextDate}>
-                    <FastImage source={require('../../../assets/images/arrowRight.png')} style={styles.arrows}/>
-                    </Pressable>
-                </View>
+                {maxEndTime !== endTime ?
+                  <View style={styles.pressableWrapper}>
+                  <Pressable onPress={handleNextDate}>
+                  <FastImage source={require('../../../assets/images/arrowRight.png')} style={styles.arrows}/>
+                  </Pressable>
+              </View> : <View style={styles.pressableWrapper}><View style={styles.arrows}/></View> }
             </View>
             <View style={styles.Blocks}>
           <View style={styles.topPart}>
@@ -227,7 +226,7 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 10,
   },
-  topPart: {
+  dayAndWeek: {
     flexDirection: 'row',
     alignSelf: 'center',
     marginTop: 16,

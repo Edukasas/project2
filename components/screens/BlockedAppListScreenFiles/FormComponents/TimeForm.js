@@ -3,6 +3,7 @@ import {Image, Text, StyleSheet, View, ScrollView, Pressable, TextInput  } from 
 import React, { useState,useEffect} from 'react';
 import { useTemporaryContext } from '../../../TemporaryContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function TimeForm({ update, returnToApps }){
         const { temporaryState, temporaryDispatch } = useTemporaryContext();
@@ -106,7 +107,11 @@ export default function TimeForm({ update, returnToApps }){
     return (
 
 
-<ScrollView vertically={true} style={styles.timeContainer} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView
+      contentContainerStyle={styles.timeContainer}
+      resetScrollToCoords={{ x: 0, y: 0 }}
+      scrollEnabled={true}
+    >
               <View style={styles.topPart}>
         <Pressable onPress={handleCancel} style={styles.cancel}>
         <Image
@@ -175,7 +180,7 @@ export default function TimeForm({ update, returnToApps }){
       <Text style={styles.name}>Second</Text>
       </View>
       </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
 );
 }
 const styles = StyleSheet.create({

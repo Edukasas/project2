@@ -1,11 +1,10 @@
 /* eslint-disable prettier/prettier */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StyleSheet, Image, ScrollView} from 'react-native';
-import { useEffect, useState } from 'react';
+import {StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import EmptyAppContainer from './HomeScreenFiles/EmptyAppContainer';
 import WithAppsContainer from './HomeScreenFiles/WithAppsContainer';
 import { useFocusEffect } from '@react-navigation/native';
-import React  from 'react';
 export default function HomeScreen({navigation}) {
      navigation.setOptions({
     headerTitle: () => (
@@ -15,11 +14,12 @@ export default function HomeScreen({navigation}) {
       />
     ),
   });
+  const MemoizedWithAppsContainer = React.memo(WithAppsContainer);
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(false);
   const [rerenderToggle, setRerenderToggle] = useState(false);
+
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Screen is focused. Rerendering...'); // Add this line for debugging
       setRerenderToggle((prev) => !prev);
     }, [])
   );
@@ -29,22 +29,23 @@ export default function HomeScreen({navigation}) {
         const storedData = await AsyncStorage.getItem('categories');
         const parsedData = JSON.parse(storedData) || []; // Parse the data, default to an empty array
        setIsStoredDataAvailable(parsedData.length > 0);
-       console.log(isStoredDataAvailable);
       } catch (error) {
         console.error('Error checking stored data:', error);
       }
     };
 
     checkStoredData();
-  }, [rerenderToggle, isStoredDataAvailable]);
+  }, [rerenderToggle]);
 return (
+
   <ScrollView vertically={true} style={styles.OuterContainer}>
-  {isStoredDataAvailable ? 
-    <WithAppsContainer/>
-      : 
+  {isStoredDataAvailable ?
+    <MemoizedWithAppsContainer/>
+      :
       <EmptyAppContainer/>
       }
       </ScrollView>
+
 ); 
 }
 

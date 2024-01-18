@@ -1,10 +1,9 @@
 import React from "react";
 import { Dimensions } from "react-native";
 import {BarChart} from "react-native-chart-kit";
-const GenerateBarChart = () => {
+const GenerateBarChart = ({series}) => {
 
     const screenWidth = Dimensions.get("window").width;
-  
     return (
       <BarChart
         style={{
@@ -15,7 +14,7 @@ const GenerateBarChart = () => {
           labels: ["S", "M", "T", "W", "T", "F", "S"],
           datasets: [
             {
-              data: [10, 20, 30, 40, 50, 60, 70],
+              data: series,
             },
           ],
         }}

@@ -2,9 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const DynamicWidthBar = ({ value, maxValue, color }) => {
-  const maxWidth = 200; // Set your maximum width here
-
-  // Calculate the width dynamically
+  const maxWidth = 200;
   const width = Math.min((value / maxValue) * maxWidth, maxWidth);
 
   return (

@@ -5,11 +5,10 @@ import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
 import { getUsageStats } from '../../helpers/UsageStats';
 import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
-import { generateCategoryColors } from '../../helpers/ColorUtils';
 import { GenerateBarChart } from '../../helpers/BarChart';
-import { useFocusEffect } from '@react-navigation/native';
+import { screenTime } from '../../helpers/ScreenTimeCalculator';
 export default function WeekStatistics({transfer}){
-    const memoizedBarChart = useMemo(() => <GenerateBarChart />, [startTime, endTime, rerenderToggle]);
+  const seriesData = [10, 15, 20, 25, 30, 35, 41];
 
     let [currentDate, setCurrentDate] = useState(new Date());
     let [formattedDate, setFormattedDate] = useState(null);
@@ -30,12 +29,10 @@ export default function WeekStatistics({transfer}){
         setFormattedDate(`${formattedStartDate} - ${formattedEndDate}`);
     }, [currentDate]);
 
-
     const updateDate = (offset) => {
         const newDate = new Date(currentDate);
         newDate.setDate(currentDate.getDate() + offset);
         setCurrentDate(newDate);
-      
         const newEndTime = new Date(endTime);
         newEndTime.setDate(newEndTime.getDate() + offset);
         newEndTime.setMinutes(0);
@@ -48,8 +45,6 @@ export default function WeekStatistics({transfer}){
         const updatedStartTime = newStartTime.getTime();
         setEndTime(updatedEndTime);
         setStartTime(updatedStartTime);
-       
-       
       };
       
       const handlePreviousDate = () => {
@@ -59,6 +54,14 @@ export default function WeekStatistics({transfer}){
       const handleNextDate = () => {
         updateDate(7);
       };
+      const [maxEndtime, setMaxEndTime] = useState(() => {
+        const currentDayOfWeek = currentDate.getDay();
+        const thisDate = new Date();
+        thisDate.setDate(currentDate.getDate() - currentDayOfWeek + 7);
+        thisDate.setMinutes(0);
+        thisDate.setHours(0);
+        return thisDate.getTime();
+      });
     const [endTime, setEndTime] = useState(() => {
       const currentDayOfWeek = currentDate.getDay();
       const thisDate = new Date();
@@ -77,27 +80,18 @@ export default function WeekStatistics({transfer}){
     });
 
     const [appUsages, setAppUsages] = useState([]);
-    let [allTime, setAllTime] = useState(0);
-    const [rerenderToggle, setRerenderToggle] = useState(false);
+    const [allTime, setAllTime] = useState(0);
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [installedApps, setInstalledApps] = useState([]);
-    const [allTimeCalculated, setAllTimeCalculated] = useState(false);
-    const appColor = useMemo(() => generateCategoryColors(series.length), [series]);
     const [showAllApps, setShowAllApps] = useState(false);
     const [btnImg, setBtnImg] = useState(false);
     const toggleAppsVisibility = () => {
       setShowAllApps(!showAllApps);
       setBtnImg(!btnImg);
     };
-
-    useFocusEffect(
-      React.useCallback(() => {
-        console.log('Screen is focused. Rerendering...'); // Add this line for debugging
-        setRerenderToggle((prev) => !prev);
-      }, [])
-    );
+    const memoizedBarChart = useMemo(() => <GenerateBarChart series={series}/>, [startTime, endTime, seriesData]);
     useEffect(() => {
       fetchInstalledApps(setInstalledApps, setLoading, setError);
     }, []);
@@ -114,25 +108,36 @@ export default function WeekStatistics({transfer}){
       fetchData();
     }, [startTime, endTime]);
     useEffect(() => {
-      const newSeries = [];
-      let updatedTime = 0;
-      installedApps.forEach((app) => {
-        let time = 0;
-        const found = appUsages.find((a) => a.app === app.packageName);
-        if (found) {
-          newSeries.push(found.time);
-          time += parseInt(found.time);
-        }
-        updatedTime += time;
-      });
-      const orderedSeries = [...newSeries].sort((a, b) => b - a);
-     
-      setSeries(orderedSeries);
-      setAllTimeCalculated(true);
-      setAllTime(updatedTime);
-      
-    }, [rerenderToggle, appUsages]);
+      const fetchData = async () => {
+        try {
+          const newSeries = [];
+          const newStartDate = new Date(startTime);
+          const newEndDate = new Date(startTime);
+          newEndDate.setDate(newEndDate.getDate() + 0);
+          newStartDate.setDate(newStartDate.getDate() - 1);
+          for (var i = 0; i < 7; i++){
+            newEndDate.setDate(newEndDate.getDate() + 1);
+            newStartDate.setDate(newStartDate.getDate() + 1);
+            const newEndDateTimestamp = newEndDate.getTime();
+            const newStartDateTimestamp = newStartDate.getTime();
+            const data = await getUsageStats(newStartDateTimestamp, newEndDateTimestamp);
+            const updatedTime = Math.ceil(screenTime(data, installedApps) / 3600);
+              newSeries.push(updatedTime);
+          };
 
+          setSeries(newSeries);
+        } 
+        catch (error) {
+          console.error(error);
+        }
+      };
+      fetchData();
+
+    }, [appUsages]);
+    useEffect(() => {
+      const updatedTime = screenTime(appUsages, installedApps);
+      setAllTime(updatedTime);
+    }, [appUsages]);
     const renderAllApps = () => {
       const renderApps = [];
       const sortedApps = [...installedApps].sort((a, b) => {
@@ -176,12 +181,12 @@ export default function WeekStatistics({transfer}){
       renderApps.sort((a, b) => b.time - a.time);
       return renderApps.map((app) => app.appBlock);
     };
-    const memoizedAllApps = useMemo(() => renderAllApps(), [appUsages, rerenderToggle]);
+    const memoizedAllApps = useMemo(() => renderAllApps(), [appUsages]);
     const renderVisibleApps = showAllApps ? memoizedAllApps : memoizedAllApps.slice(0, 3);
     const renderImg = btnImg ? require('../../../assets/images/up.png') : require('../../../assets/images/down.png');
     return (
         <ScrollView vertically={true} style={styles.OuterContainer}>
-           <View style={styles.topPart}>
+           <View style={styles.dayAndWeek}>
            <Pressable
           style={[
             styles.topPartButton,
@@ -222,19 +227,21 @@ export default function WeekStatistics({transfer}){
                 <Image source={require('../../../assets/images/arrowLeft.png')} style={styles.arrows}/>
                 </Pressable>
                 <Text style={styles.date}>{formattedDate}</Text>
-                <Pressable onPress={handleNextDate}>
-                <Image source={require('../../../assets/images/arrowRight.png')} style={styles.arrows}/>
-                </Pressable>
+                {maxEndtime !== endTime ?
+              <Pressable onPress={handleNextDate}>
+              <Image source={require('../../../assets/images/arrowRight.png')} style={styles.arrows}/>
+              </Pressable> : <View style={styles.arrows}/>
+              }
             </View>
             <View style={styles.Blocks}>
           <View style={styles.topPart}>
             <Text style={styles.BlockName}>Screen Time</Text>
             <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
           </View>
-          {appColor.length === series.length && series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
+          {series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
             memoizedBarChart
       ) : (
-<></>
+<View style={{ height: 220 }} />
       )}
           {renderVisibleApps}
           {series.length > 3 ?
@@ -251,10 +258,18 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 10,
   },
-  topPart: {
+  dayAndWeek: {
     flexDirection: 'row',
     alignSelf: 'center',
     marginTop: 16,
+  },
+  topPart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    lineHeight: 21,
+    marginTop: 18,
+    marginLeft: 25,
+    marginRight: 25,
   },
   topPartButton: {
     color: '#BBC4EC',
@@ -303,14 +318,6 @@ const styles = StyleSheet.create({
       Blocks: {
           borderRadius: 17,
           backgroundColor: '#191C25',
-        },
-        topPart: {
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          lineHeight: 21,
-          marginTop: 18,
-          marginLeft: 25,
-          marginRight: 25,
         },
         allTime: {
           color: 'white',

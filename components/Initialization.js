@@ -33,8 +33,19 @@ export default function Start({onPress}) {
         <Text style={styles.h1text}>
           Click on the button below to begin your journey aboard
         </Text>
-        <Pressable onPress={onPress} style={styles.button}>
-          <Text style={styles.buttonText}>GET STARTED</Text>
+        <Pressable onPress={onPress} style={({ pressed }) => [
+    styles.button,
+    {
+      backgroundColor: pressed ? '#E8E8E8' : '#354171',
+      borderWidth: pressed ? 2 : 0,
+      borderColor: '#354171',
+    },
+  ]}>
+  {({ pressed }) => (
+    <Text style={[styles.buttonText, { color: pressed ? '#354171' : '#E8E8E8' }]}>
+      GET STARTED
+    </Text>
+  )}
         </Pressable>
         <Image
           source={require('../assets/images/leftcircles.png')}

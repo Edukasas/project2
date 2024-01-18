@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {StyleSheet, Image, Text, View, ScrollView} from 'react-native';
+import {StyleSheet, Image, Text, View, ScrollView, ActivityIndicator} from 'react-native';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DynamicBar } from '../../helpers/DynamicBar';
 import { getUsageStats } from '../../helpers/UsageStats';
@@ -7,7 +7,6 @@ import { fetchInstalledApps } from '../../helpers/FetchingApps';
 import { loadCategories } from '../../helpers/LoadDataFromStorage';
 import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
 import { generateCategoryColors } from '../../helpers/ColorUtils';
-import { useFocusEffect } from '@react-navigation/native';
 import PieChart from 'react-native-pie-chart';
 export default function WithAppsContainer() {
   const { startTime, endTime } = useMemo(() => {
@@ -18,9 +17,9 @@ export default function WithAppsContainer() {
     const startTime = start.getTime();
     return { startTime, endTime: currentTime.getTime() };
   }, []);
+  const LazyPieChart = React.lazy(() => import('../../helpers/LazyPieChart'));
   const [appUsages, setAppUsages] = useState([]);
   const [allTime, setAllTime] = useState(0);
-  const [rerenderToggle, setRerenderToggle] = useState(false);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,12 +28,6 @@ export default function WithAppsContainer() {
   const [allTimeCalculated, setAllTimeCalculated] = useState(false);
   const widthAndHeight = 160;
   const categoryColors = useMemo(() => generateCategoryColors(categories.length), [categories]);
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('Screen is focused. Rerendering...'); // Add this line for debugging
-      setRerenderToggle((prev) => !prev);
-    }, [])
-  );
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -45,7 +38,7 @@ export default function WithAppsContainer() {
     };
   
     loadData();
-  }, [rerenderToggle]);
+  }, [appUsages]);
   
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +67,6 @@ export default function WithAppsContainer() {
           const found = appUsages.find((a) => a.app === app);
           if (found) {
             time += parseInt(found.time);
-            console.log(category.selectedApps," ", time);
           }
         });
         newSeries.push(time);
@@ -84,7 +76,7 @@ export default function WithAppsContainer() {
       setSeries(newSeries);
       setAllTimeCalculated(true);
       setAllTime(updatedTime);
-  }, [rerenderToggle, allTimeCalculated, categories]);
+  }, [allTimeCalculated, categories]);
 
  
 
@@ -195,7 +187,16 @@ return (
             <Text style={styles.allTime}>{calculateHoursAndMinutes(allTime)}</Text>
           </View>
           {categoryColors.length === series.length && series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
-        <PieChart
+
+        <React.Suspense fallback={        <PieChart
+          style={styles.PieChart}
+          widthAndHeight={widthAndHeight}
+          series={[1]}
+          sliceColor={['#191C25']}
+          coverRadius={0.80}
+          coverFill={'#191C25'}
+        />}>
+        <LazyPieChart
           style={styles.PieChart}
           widthAndHeight={widthAndHeight}
           series={series}
@@ -203,8 +204,16 @@ return (
           coverRadius={0.80}
           coverFill={'#191C25'}
         />
+      </React.Suspense>
       ) : (
-        <></>
+        <PieChart
+        style={styles.PieChart}
+        widthAndHeight={widthAndHeight}
+        series={[1]}
+        sliceColor={['#686B72']}
+        coverRadius={0.80}
+        coverFill={'#191C25'}
+      />
       )}
           {memoizedCategoryBlocks}
         </View>
