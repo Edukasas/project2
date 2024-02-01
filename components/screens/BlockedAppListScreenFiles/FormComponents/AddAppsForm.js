@@ -2,7 +2,7 @@
 import {Image, Text, StyleSheet, View, TouchableOpacity, Pressable, TextInput, Animated, FlatList} from 'react-native';
 import React, { useEffect, useState, useRef} from 'react';
 import { InstalledApps } from 'react-native-launcher-kit';
-import { useTemporaryContext } from '../../../TemporaryContext';
+import { useTemporaryContext } from '../../../helpers/AppData/TemporaryContext';
 import FastImage from 'react-native-fast-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

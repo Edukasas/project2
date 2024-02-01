@@ -2,14 +2,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StyleSheet, Image, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import EmptyAppContainer from './HomeScreenFiles/EmptyAppContainer';
-import WithAppsContainer from './HomeScreenFiles/WithAppsContainer';
+import EmptyAppContainer from '../HomeScreenFiles/EmptyAppContainer';
+import WithAppsContainer from '../HomeScreenFiles/WithAppsContainer';
 import { useFocusEffect } from '@react-navigation/native';
 export default function HomeScreen({navigation}) {
      navigation.setOptions({
     headerTitle: () => (
       <Image
-        source={require('../../assets/images/logo.png')}
+        source={require('../../../assets/images/logo.png')}
         style={styles.logo}
       />
     ),

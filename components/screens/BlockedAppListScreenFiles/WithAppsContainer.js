@@ -2,11 +2,11 @@
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
 import React, { useEffect, useState, useMemo} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DynamicBar } from '../../helpers/DynamicBar';
-import { getUsageStats } from '../../helpers/UsageStats';
-import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { loadCategories } from '../../helpers/LoadDataFromStorage';
-import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
+import { DynamicBar } from '../../helpers/Charts/DynamicBar';
+import { getUsageStats } from '../../helpers/Time/UsageStats';
+import { fetchInstalledApps } from '../../helpers/AppData/FetchingApps';
+import { loadCategories } from '../../helpers/AppData/LoadDataFromStorage';
+import { calculateHoursAndMinutes } from '../../helpers/Time/TimeUtils';
 export default function WithAppContainer({setIsStoredDataAvailable, edit}) {
   const { startTime, endTime } = useMemo(() => {
     const currentTime = new Date();

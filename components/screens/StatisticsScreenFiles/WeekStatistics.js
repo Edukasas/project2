@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { StyleSheet, View, Text, Image, Pressable, ScrollView } from 'react-native';
 import React, {useState, useEffect, useMemo} from 'react';
-import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
-import { getUsageStats } from '../../helpers/UsageStats';
-import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
-import { GenerateBarChart } from '../../helpers/BarChart';
-import { screenTime } from '../../helpers/ScreenTimeCalculator';
+import { DynamicWidthBar } from '../../helpers/Charts/DynamicWidthBar';
+import { getUsageStats } from '../../helpers/Time/UsageStats';
+import { fetchInstalledApps } from '../../helpers/AppData/FetchingApps';
+import { calculateHoursAndMinutes } from '../../helpers/Time/TimeUtils';
+import { GenerateBarChart } from '../../helpers/Charts/BarChart';
+import { screenTime } from '../../helpers/Time/ScreenTimeCalculator';
 export default function WeekStatistics({transfer}){
   const seriesData = [10, 15, 20, 25, 30, 35, 41];
 

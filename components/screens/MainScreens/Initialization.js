@@ -10,17 +10,17 @@ export default function Start({onPress}) {
         style={styles.background}
       />
       <Image
-        source={require('../assets/images/stars.png')}
+        source={require('../../../assets/images/stars.png')}
         style={styles.logoStars}
         resizeMode="cover"
       />
       <View style={styles.main}>
         <Image
-          source={require('../assets/images/logo.png')}
+          source={require('../../../assets/images/logo.png')}
           style={styles.logo}
         />
         <Image
-          source={require('../assets/images/logoName.png')}
+          source={require('../../../assets/images/logoName.png')}
           style={styles.logoName}
         />
       </View>
@@ -48,11 +48,11 @@ export default function Start({onPress}) {
   )}
         </Pressable>
         <Image
-          source={require('../assets/images/leftcircles.png')}
+          source={require('../../../assets/images/leftcircles.png')}
           style={styles.leftcircles}
         />
         <Image
-          source={require('../assets/images/rightcircles.png')}
+          source={require('../../../assets/images/rightcircles.png')}
           style={styles.rightcircles}
         />
       </View>

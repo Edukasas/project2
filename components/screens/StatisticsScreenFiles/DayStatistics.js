@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { StyleSheet, View, Text, Image, Pressable, ScrollView } from 'react-native';
 import React, {useState, useEffect, useMemo} from 'react';
-import { DynamicWidthBar } from '../../helpers/DynamicWidthBar';
-import { getUsageStats } from '../../helpers/UsageStats';
-import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
-import { generateCategoryColors } from '../../helpers/ColorUtils';
+import { DynamicWidthBar } from '../../helpers/Charts/DynamicWidthBar';
+import { getUsageStats } from '../../helpers/Time/UsageStats';
+import { fetchInstalledApps } from '../../helpers/AppData/FetchingApps';
+import { calculateHoursAndMinutes } from '../../helpers/Time/TimeUtils';
+import { generateCategoryColors } from '../../helpers/Colors/ColorUtils';
 import FastImage from 'react-native-fast-image';
 import PieChart from 'react-native-pie-chart';
 export default function DayStatistics({transfer}){

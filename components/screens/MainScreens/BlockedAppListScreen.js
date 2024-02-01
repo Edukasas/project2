@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, StyleSheet, Pressable, Text, Animated } from 'react-native';
+import { StyleSheet, Pressable, Text, Animated, View } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
-import AddCategory from './BlockedAppListScreenFiles/AddCategory';
-import EmptyAppContainer from './BlockedAppListScreenFiles/EmptyAppsContainer';
-import WithAppContainer from './BlockedAppListScreenFiles/WithAppsContainer';
+import AddCategory from '../BlockedAppListScreenFiles/AddCategory';
+import EmptyAppContainer from '../BlockedAppListScreenFiles/EmptyAppsContainer';
+import WithAppContainer from '../BlockedAppListScreenFiles/WithAppsContainer';
+
 export default function BlockedAppListScreen() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [isStoredDataAvailable, setIsStoredDataAvailable] = useState(true);

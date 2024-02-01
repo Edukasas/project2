@@ -3,11 +3,11 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Screens
-import HomeScreen from './screens/HomeScreen';
-import BlockedAppScreen from './screens/BlockedAppListScreen';
-import StatisticsScreen from './screens/StatisticsScreen';
-import { iconSources } from './IconSources';
-import { ActiveIcon} from './IconComponents';
+import HomeScreen from '../MainScreens/HomeScreen';
+import BlockedAppScreen from '../MainScreens/BlockedAppListScreen';
+import StatisticsScreen from '../MainScreens/StatisticsScreen';
+import { iconSources } from '../../helpers/Icons/IconSources';
+import { ActiveIcon} from '../../helpers/Icons/IconComponents';
 // Screen Names
 const HomeName = 'Home';
 const BlockedAppListName = 'Apps Blocked';

@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { StyleSheet, View } from 'react-native';
 import React, { useState } from 'react';
-import DayStatistics from './StatisticsScreenFiles/DayStatistics';
-import WeekStatistics from './StatisticsScreenFiles/WeekStatistics';
+import DayStatistics from '../StatisticsScreenFiles/DayStatistics';
+import WeekStatistics from '../StatisticsScreenFiles/WeekStatistics';
 export default function StatisticsScreen({ navigation }) {
   const [activeButton, setActiveButton] = useState(true);
 const transfer = () => {

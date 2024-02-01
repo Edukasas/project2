@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import AddAppsForm from './FormComponents/AddAppsForm';
 import TimeForm from './FormComponents/TimeForm';
-import { TemporaryProvider } from '../../TemporaryContext';
+import { TemporaryProvider } from '../../helpers/AppData/TemporaryContext';
 
 const AddCategory = ({ update, onCancel, categoryToEdit }) => {
 

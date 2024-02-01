@@ -1,13 +1,13 @@
 /* eslint-disable prettier/prettier */
-import {StyleSheet, Image, Text, View, ScrollView, ActivityIndicator} from 'react-native';
-import React, { useEffect, useState, useMemo } from 'react';
-import { DynamicBar } from '../../helpers/DynamicBar';
-import { getUsageStats } from '../../helpers/UsageStats';
-import { fetchInstalledApps } from '../../helpers/FetchingApps';
-import { loadCategories } from '../../helpers/LoadDataFromStorage';
-import { calculateHoursAndMinutes } from '../../helpers/TimeUtils';
-import { generateCategoryColors } from '../../helpers/ColorUtils';
-import PieChart from 'react-native-pie-chart';
+import {StyleSheet, Image, Text, View, ScrollView} from 'react-native';
+import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
+import { DynamicBar } from '../../helpers/Charts/DynamicBar';
+import { getUsageStats } from '../../helpers/Time/UsageStats';
+import { fetchInstalledApps } from '../../helpers/AppData/FetchingApps';
+import { loadCategories } from '../../helpers/AppData/LoadDataFromStorage';
+import { calculateHoursAndMinutes } from '../../helpers/Time/TimeUtils';
+import { generateCategoryColors } from '../../helpers/Colors/ColorUtils';
+import {PieChartSkeleton, AppTimerSkeleton} from '../../helpers/Skeletons/Skeletons';
 export default function WithAppsContainer() {
   const { startTime, endTime } = useMemo(() => {
     const currentTime = new Date();
@@ -17,7 +17,7 @@ export default function WithAppsContainer() {
     const startTime = start.getTime();
     return { startTime, endTime: currentTime.getTime() };
   }, []);
-  const LazyPieChart = React.lazy(() => import('../../helpers/LazyPieChart'));
+  const LazyPieChart = lazy(() => import('../../helpers/Charts/LazyPieChart'));
   const [appUsages, setAppUsages] = useState([]);
   const [allTime, setAllTime] = useState(0);
   const [series, setSeries] = useState([]);
@@ -125,6 +125,8 @@ export default function WithAppsContainer() {
   return renderBlocks;
 };
 
+
+
 const renderAllApps = () => {
   if (categories === null) {
     return null;
@@ -188,14 +190,7 @@ return (
           </View>
           {categoryColors.length === series.length && series.length > 0 && series.reduce((acc, val) => acc + val, 0) > 0 ? (
 
-        <React.Suspense fallback={        <PieChart
-          style={styles.PieChart}
-          widthAndHeight={widthAndHeight}
-          series={[1]}
-          sliceColor={['#191C25']}
-          coverRadius={0.80}
-          coverFill={'#191C25'}
-        />}>
+       
         <LazyPieChart
           style={styles.PieChart}
           widthAndHeight={widthAndHeight}
@@ -204,16 +199,9 @@ return (
           coverRadius={0.80}
           coverFill={'#191C25'}
         />
-      </React.Suspense>
+
       ) : (
-        <PieChart
-        style={styles.PieChart}
-        widthAndHeight={widthAndHeight}
-        series={[1]}
-        sliceColor={['#686B72']}
-        coverRadius={0.80}
-        coverFill={'#191C25'}
-      />
+        <PieChartSkeleton/>
       )}
           {memoizedCategoryBlocks}
         </View>
